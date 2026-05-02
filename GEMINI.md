@@ -96,7 +96,19 @@ The EKS cluster is pre-configured with essential platform services:
 - **User:** All containers run as a **non-root user** (UID 65532).
 - **Secrets:** Never commit `.env` files. Use **AWS Secrets Manager** in production.
 
-## 6. Architectural Principles
+## 6. Custom Skills
+This project utilizes interoperable AI agent skills located in the **`.agents/skills/`** directory. This follows industry best practices, ensuring compatibility across multiple agents (Gemini CLI, Claude Code, etc.).
+
+### scaffold-terraform
+- **Location:** `.agents/skills/scaffold-terraform/`
+- **Purpose:** Automates the creation and integration of modular AWS infrastructure.
+- **Key Features:**
+    - Dynamic version discovery from Terraform Registry.
+    - Strict Mumbai (ap-south-1) regional defaults.
+    - Automated remote state (S3/DynamoDB) configuration.
+- **Workflow:** **STOP-AND-ASK.** The agent must identify this skill and request user permission before execution.
+
+## 7. Architectural Principles
 - **Event-Driven:** Async communication via **RabbitMQ Fanout Exchange** (`order_events`).
 - **Statelessness:** Microservices are stateless; persistence is delegated to relational/document databases.
 - **GitOps:** The Git repository is the single source of truth for both application and infrastructure state.
