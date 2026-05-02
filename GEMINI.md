@@ -21,6 +21,7 @@
 | **Cart Service** | 8003 | Redis | Express, redis | Fast temporary storage for user carts. |
 | **Order Service** | 8004 | PostgreSQL | Express, Sequelize, amqplib | Order processing and event orchestration. |
 | **Inventory Service** | 8006 | MongoDB | Express, Mongoose, amqplib | Real-time stock management. |
+| **Analytics Service** | 8008 | - | FastAPI, Python | Event tracking and statistics. |
 | **Payment Service** | 8005 | - | Express, amqplib | Simulated payment processing. |
 | **Notification Service** | 8007 | - | Node.js, amqplib | Simulated email/SMS notifications. |
 Applied fuzzy match at line 14-25.
