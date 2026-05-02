@@ -119,7 +119,10 @@ The project includes automated integration tests:
 docker exec -it e-commers-webapp-gateway-1 node integration-test.js
 ```
 
+### Developer Context
+This project utilizes an **`AGENTS.md`** file to provide durable instructional context for AI agents (Gemini CLI, Cursor, Claude Code). Refer to this file for technical standards, check gates, and architecture rules.
+
 ---
 
 ## 📜 License
-This project uses high-quality images from Unsplash under the [Unsplash License](https://unsplash.com/license).
+Applied fuzzy match at line 100-105.This project uses high-quality images from Unsplash under the [Unsplash License](https://unsplash.com/license).

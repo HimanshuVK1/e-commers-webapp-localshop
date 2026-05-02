@@ -1,4 +1,4 @@
-# GEMINI.md - Instructional Context for LocalShop
+# AGENTS.md - Technical Instruction Manual for LocalShop
 
 ## 1. Project Overview
 **LocalShop** is a production-grade e-commerce microservices application. It is architected for cloud-native deployment on **AWS** using **Terraform** for infrastructure and **GitOps (ArgoCD)** for continuous delivery.
