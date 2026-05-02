@@ -30,14 +30,19 @@ Applied fuzzy match at line 14-25.
 The project utilizes **GitHub Actions** for automated CI/CD and **ArgoCD** for GitOps-based deployment to EKS.
 
 ### Service CI/CD Pipeline
-Every push to the `main` branch triggers a multi-stage pipeline:
-1.  **Code Analysis:** Static code analysis and security scanning via **SonarQube**.
-2.  **Vulnerability Scan:** Dependency and filesystem scanning using **Trivy**.
+Every push to the `main` branch triggers a multi-stage pipeline with strict **Check Gates**:
+
+1.  **Code Analysis:** Static code analysis via **SonarQube**.
+    - **Gate:** **Quality Gate must PASS** (Min 80% coverage, 0 critical issues).
+2.  **Code Vulnerability Scan:** Dependency scanning using **Trivy**.
+    - **Gate:** **Zero HIGH or CRITICAL** vulnerabilities in code dependencies.
 3.  **Build:** Multi-stage Docker build using optimized **Distroless** base images.
-4.  **Image Scan:** Container image vulnerability scanning with **Trivy**.
-5.  **Publish:** Pushing verified images to **Docker Hub**.
-6.  **Deploy:** ArgoCD detects changes in the GitOps repository and synchronizes the EKS cluster.
-7.  **Verify:** Automated **Integration Testing** runs against the EKS environment.
+4.  **Image Vulnerability Scan:** Final container image scanning with **Trivy**.
+    - **Gate:** **Zero HIGH or CRITICAL** vulnerabilities in the OS/Runtime layers.
+5.  **Publish:** Verified images are pushed to **Docker Hub** only after all previous gates pass.
+6.  **Deploy:** ArgoCD synchronizes the EKS cluster based on the new image tags.
+7.  **Post-Deployment Verify:** Automated **Integration Testing** against the live EKS environment.
+    - **Gate:** **100% test pass rate** required for final deployment sign-off.
 
 ### Infrastructure as Code (Terraform)
 All infrastructure is provisioned via Terraform following a modular, reusable architecture located in the `terraform/` directory.
