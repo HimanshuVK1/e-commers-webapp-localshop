@@ -1,6 +1,6 @@
 # LocalShop | Premium E-Commerce Microservices
 
-![LocalShop Logo](frontend/public/logo.svg)
+<img src="frontend/public/logo.svg" width="120" alt="LocalShop Logo" />
 
 LocalShop is a production-grade, fully functional e-commerce platform built with a microservices architecture. It is designed to run 100% locally using Docker Desktop while adhering to enterprise security and architectural standards.
 
