@@ -15,8 +15,27 @@ LocalShop is a production-grade, fully functional e-commerce platform built with
 
 ---
 
-## 🏗 Architecture Overview
+## 🛠 Tech Stack & Frameworks
 
+### Frontend
+- **Next.js 14 (App Router):** Core React framework.
+- **Tailwind CSS:** Utility-first styling.
+- **shadcn/ui:** High-end UI component library.
+- **Zustand:** Lightweight state management.
+- **Lucide React:** Iconography.
+
+### Backend Microservices
+- **Express.js (Node.js):** Standard framework for all 7 services and the Gateway.
+- **Sequelize (ORM):** Relational data management for **User** and **Order** services (PostgreSQL).
+- **Mongoose (ODM):** Document data management for **Product** and **Inventory** services (MongoDB).
+- **amqplib:** Robust messaging client for **RabbitMQ** event orchestration.
+- **Redis Client:** High-performance caching for the **Cart** service.
+- **JWT & Bcrypt:** Secure authentication and credential hashing.
+
+---
+
+## 🏗 Architecture Overview
+Applied fuzzy match at line 35-50.
 The system consists of the following components:
 
 ### Frontend
