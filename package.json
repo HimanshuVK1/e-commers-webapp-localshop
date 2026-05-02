@@ -1,0 +1,13 @@
+{
+  "name": "e-commers-webapp",
+  "version": "1.0.0",
+  "description": "Microservices E-commerce App",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm install && npm install --prefix gateway && npm install --prefix services/user-service && npm install --prefix services/product-service && npm install --prefix services/cart-service && npm install --prefix services/order-service && npm install --prefix services/payment-service && npm install --prefix services/inventory-service && npm install --prefix services/notification-service && npm install --prefix frontend",
+    "dev": "concurrently \"npm run dev --prefix gateway\" \"npm run dev --prefix services/user-service\" \"npm run dev --prefix services/product-service\" \"npm run dev --prefix services/cart-service\" \"npm run dev --prefix services/order-service\" \"npm run dev --prefix services/payment-service\" \"npm run dev --prefix services/inventory-service\" \"npm run dev --prefix services/notification-service\" \"npm run dev --prefix frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
