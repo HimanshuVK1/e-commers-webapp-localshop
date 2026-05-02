@@ -69,6 +69,7 @@ services:
     init: true
     ports:
       - "8000:8000"
+    env_file: ./gateway/.env
     environment:
       - NODE_ENV=development
       - PORT=8000
@@ -90,6 +91,7 @@ services:
     init: true
     ports:
       - "8001:8001"
+    env_file: ./services/user-service/.env
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -108,6 +110,7 @@ services:
     init: true
     ports:
       - "8002:8002"
+    env_file: ./services/product-service/.env
     environment:
       - MONGO_URI=mongodb://mongo:27017/ecommerce
     depends_on:
@@ -121,6 +124,7 @@ services:
     init: true
     ports:
       - "8003:8003"
+    env_file: ./services/cart-service/.env
     environment:
       - REDIS_URL=redis://redis:6379
     depends_on:
@@ -134,6 +138,7 @@ services:
     init: true
     ports:
       - "8004:8004"
+    env_file: ./services/order-service/.env
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
