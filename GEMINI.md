@@ -40,18 +40,26 @@ Every push to the `main` branch triggers a multi-stage pipeline:
 7.  **Verify:** Automated **Integration Testing** runs against the EKS environment.
 
 ### Infrastructure as Code (Terraform)
-Infrastructure is managed via a dedicated CI/CD pipeline that provisions:
-- **Networking:** VPC with public/private subnets, NAT Gateways, and Security Groups.
-- **Compute:** Amazon EKS Cluster with managed Node Groups and auxiliary EC2 VMs.
-- **Delivery:** Amazon CloudFront with Application Load Balancers (ALB).
-- **Secrets:** Integration with **AWS Secrets Manager** for secure environment variable injection.
-- **Storage:** S3 Buckets for logging and monitoring data persistence.
+All infrastructure is provisioned via Terraform following a modular, reusable architecture located in the `terraform/` directory.
+
+#### Configuration Standards:
+- **Structure:** 
+    - `terraform/`: Root module containing the main environment configuration.
+    - `terraform/modules/`: Directory for all child modules.
+- **Modularity:** Every AWS service (VPC, EKS, RDS, etc.) must be isolated in its own child module within the `modules/` directory.
+- **Module Files:** Each module must contain exactly:
+    - `main.tf`: Resource definitions.
+    - `variables.tf`: Input declarations for inter-module connectivity.
+    - `outputs.tf`: Exported attributes for other modules to consume.
+- **Dependency Flow:** Modules must connect to other module configurations exclusively via `variables.tf` and `outputs.tf` to maintain a clean dependency graph.
+- **Tooling:** Use verified community modules from **`terraform-aws-modules/*`** for all standard AWS resources.
+- **Versioning:** All provider and module versions must be **strictly fixed** to ensure environment stability and reproducible builds.
 
 ### EKS Platform Setup
 The EKS cluster is pre-configured with essential platform services:
 - **Ingress:** Nginx Ingress Controller for traffic routing.
 - **GitOps:** ArgoCD for automated application lifecycle management.
-- **Observability:** 
+- **Observability:**
     - **Prometheus & Grafana:** For metrics collection and visualization.
     - **Loki:** For log aggregation (integrated with **AWS S3** for long-term storage).
     - **Metrics Server:** For HPA (Horizontal Pod Autoscaler) support.
