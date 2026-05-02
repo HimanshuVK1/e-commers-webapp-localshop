@@ -25,7 +25,8 @@ LocalShop is a production-grade, fully functional e-commerce platform built with
 - **Lucide React:** Iconography.
 
 ### Backend Microservices
-- **Express.js (Node.js):** Standard framework for all 7 services and the Gateway.
+- **Express.js (Node.js):** Standard framework for the Gateway and core Node services.
+- **FastAPI (Python):** High-performance framework used for the **Analytics** service.
 - **Sequelize (ORM):** Relational data management for **User** and **Order** services (PostgreSQL).
 - **Mongoose (ODM):** Document data management for **Product** and **Inventory** services (MongoDB).
 - **amqplib:** Robust messaging client for **RabbitMQ** event orchestration.

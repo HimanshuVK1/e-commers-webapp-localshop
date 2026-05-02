@@ -43,7 +43,8 @@ const routes = [
   { path: '/api/cart', target: process.env.CART_SERVICE_URL || 'http://localhost:8003', auth: true },
   { path: '/api/orders', target: process.env.ORDER_SERVICE_URL || 'http://localhost:8004', auth: true },
   { path: '/api/payment', target: process.env.PAYMENT_SERVICE_URL || 'http://localhost:8005', auth: true },
-  { path: '/api/inventory', target: process.env.INVENTORY_SERVICE_URL || 'http://localhost:8006', auth: true }
+  { path: '/api/inventory', target: process.env.INVENTORY_SERVICE_URL || 'http://localhost:8006', auth: true },
+  { path: '/api/analytics', target: process.env.ANALYTICS_SERVICE_URL || 'http://localhost:8008', auth: true }
 ];
 
 // Apply Proxies (WITHOUT express.json() globally)

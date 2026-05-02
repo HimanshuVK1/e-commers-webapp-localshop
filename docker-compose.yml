@@ -80,6 +80,7 @@ services:
       - ORDER_SERVICE_URL=http://order-service:8004
       - PAYMENT_SERVICE_URL=http://payment-service:8005
       - INVENTORY_SERVICE_URL=http://inventory-service:8006
+      - ANALYTICS_SERVICE_URL=http://analytics-service:8008
     depends_on:
       - user-service
       - product-service
@@ -191,6 +192,16 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  analytics-service:
+    build: ./services/analytics-service
+    init: true
+    ports:
+      - "8008:8008"
+    depends_on:
+      - gateway
     networks:
       - ecommerce-network
 
