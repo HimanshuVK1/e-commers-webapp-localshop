@@ -51,11 +51,6 @@ desktop.ini
 .npm-cache/
 .eslintcache
 
-# Project specific
-integration-test.js
-verify-images.js
-ecommers-webapp-design.txt
-
 # Terraform
 .terraform/
 *.tfstate
@@ -69,3 +64,12 @@ override.tf.json
 _override.tf
 _override.tf.json
 .terraform.lock.hcl
+terraform/tfplan
+**/.terraform/
+
+# Gemini Skills/Agents Build Artifacts
+*.skill
+.gemini/tmp/
+
+# Additional Design/Temp Files
+ecommers-webapp-design.txt

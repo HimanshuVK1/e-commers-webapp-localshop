@@ -1,81 +1,54 @@
-# LocalShop | Premium E-Commerce Microservices
+# LocalShop E-Commerce System
 
-<img src="webapp/frontend/public/logo.svg" width="120" alt="LocalShop Logo" />
+A production-grade, microservices-based e-commerce platform with integrated **Agentic DevOps**.
 
-LocalShop is a production-grade, fully functional e-commerce platform built with a microservices architecture. It is designed for cloud-native scalability while maintaining a seamless local development experience.
+## 🏗 Project Architecture
 
-## 🚀 Key Features
+This repository is divided into three core pillars:
 
-- **Clean Separation:** Isolated application code (`webapp/`) and infrastructure as code (`terraform/`).
-- **Scalable Microservices:** 8 independent services (including FastAPI) + API Gateway.
-- **Modern UI/UX:** Built with Next.js 14, Tailwind CSS, and `shadcn/ui`.
-- **Event-Driven:** Real-time inventory and notification updates via RabbitMQ.
-- **Production-Ready Docker:** Multi-stage builds, Distroless images, and non-root users.
+1.  **Infrastructure (`/terraform`)**: Modular AWS Infrastructure as Code using `terraform-aws-modules`. Features 3-tier networking, EKS, and RDS isolation.
+2.  **Application (`/webapp`)**: A distributed microservices system consisting of 8 services (Node.js/FastAPI), a Next.js 14 frontend, and RabbitMQ messaging.
+3.  **Operations (`/.gemini`)**: An autonomous DevOps workspace containing specialized AI Skills and Subagents.
 
 ---
 
-## 🏗 Repository Structure
+## 🤖 Agentic DevOps Workspace
 
-```text
-.
-├── .agents/          # Interoperable AI agent skills
-├── terraform/        # Modular AWS Infrastructure (VPC, EKS, RDS)
-└── webapp/           # Application Source Code & Docker Orchestration
-    ├── frontend/     # Next.js 14 Dashboard
-    ├── gateway/      # API Gateway (Express)
-    └── services/     # Microservices (Node.js & FastAPI)
+This project uses the **Gemini CLI** to power an autonomous DevOps team. Our specialized subagents are configured to maintain project standards and security:
+
+- **`@tf-writer`**: Senior Terraform Engineer. Generates standardized, modular IaC with integrated MCP tools.
+- **`@security-auditor`**: AWS Security Specialist. Performs proactive audits against a strict 9-point security checklist.
+- **`@cost-optimizer`**: Cloud Cost Specialist. Analyzes infrastructure for savings and efficiency.
+
+### Key Skills:
+- `tf-plan`: Automated risk assessment and plan analysis.
+- `tf-apply`: Safe execution with post-deployment verification (CloudFront/S3).
+- `scaffold-terraform`: Enforces architectural standards for new AWS resources.
+
+---
+
+## 🛡 Technical Mandates
+
+All development and operations must adhere to the foundational mandates defined in **`GEMINI.md`**. This includes:
+- **Security:** Distroless images, non-root users, and private S3 buckets.
+- **Standards:** Modular Terraform organization and pinned provider versions.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Infrastructure Setup
+See [terraform/README.md](terraform/README.md) (or consult `@tf-writer`) for instructions on deploying the AWS environment.
+
+### 2. Application Setup
+See [webapp/README.md](webapp/README.md) for local development instructions using Docker Compose.
+
+### 3. Agentic Workflow
+Ensure you have the Gemini CLI installed and run the following to activate the workspace agents:
+```bash
+/skills reload
+/agents reload
 ```
 
----
-
-## 🛠 Tech Stack & Frameworks
-
-### Frontend
-- **Next.js 14 (App Router):** Core React framework.
-- **Tailwind CSS & shadcn/ui:** Styling and professional components.
-- **Zustand:** Lightweight state management.
-
-### Backend Microservices
-- **Express.js (Node.js):** Core framework for Gateway and Node services.
-- **FastAPI (Python):** Used for high-performance **Analytics**.
-- **Sequelize & Mongoose:** ORM/ODM for PostgreSQL and MongoDB.
-- **amqplib:** RabbitMQ messaging client.
-
----
-
-## 🛡 Security & Best Practices
-
-- **Distroless Runtime:** Minimal attack surface with shell-free images.
-- **Non-Root Execution:** All containers run as restricted user (UID 65532).
-- **Native S3 Locking:** Modern, DynamoDB-free Terraform state management.
-- **Strict Versioning:** All CLI and provider versions are strictly pinned.
-
----
-
-## 🛠 Getting Started
-
-### Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Terraform 1.15.1+](https://www.terraform.io/)
-
-### Installation
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/HimanshuVK1/e-commers-webapp-localshop.git
-    cd e-commers-webapp-localshop
-    ```
-
-2.  **Start the Webapp:**
-    ```bash
-    cd webapp
-    # Copy all .env.example files to .env in each sub-directory
-    docker-compose up -d --build
-    ```
-
----
-
-### Developer Context
-This project utilizes an **`AGENTS.md`** file to provide durable instructional context for AI agents. Refer to this file for technical standards, check gates, and architecture rules.
-
 ## 📜 License
-This project uses high-quality images from Unsplash under the [Unsplash License](https://unsplash.com/license).
+This project is for educational and prototype purposes. Application images used are under the Unsplash License.

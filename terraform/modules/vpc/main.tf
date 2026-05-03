@@ -10,8 +10,7 @@ terraform {
 }
 
 module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "6.6.1"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git?ref=3ffbd46fb1c7733e1b34d8666893280454e27436"
 
   name = "localshop-${var.environment}-vpc"
   cidr = "10.0.0.0/16"

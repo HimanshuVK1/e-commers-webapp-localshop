@@ -62,5 +62,10 @@ You MUST execute the following phases in sequence. Do not skip steps.
     - **Links:** Mapped [X] inputs to [Y] outputs.
     - **Security:** Verified non-root and distroless alignment.
 
+### Phase 5: Security Posture (The 'Compliance' step)
+1.  **MANDATORY:** You MUST activate and run the **`terraform-config-infra-scanner`** skill on the `terraform/` directory.
+2.  Review any FAILED checks.
+3.  If critical vulnerabilities are found, you MUST fix them using the **`security-auditor`** subagent before finishing the task.
+
 ## References
 - Refer to `references/naming-conventions.md` for resource naming rules.
