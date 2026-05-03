@@ -1,5 +1,7 @@
 # LocalShop E-Commerce System
 
+<img src="webapp/frontend/public/logo.svg" width="120" alt="LocalShop Logo" />
+
 A production-grade, microservices-based e-commerce platform with integrated **Agentic DevOps**.
 
 ## 🏗 Project Architecture
