@@ -101,12 +101,18 @@ This project utilizes interoperable AI agent skills located in the **`.agents/sk
 
 ### scaffold-terraform
 - **Location:** `.agents/skills/scaffold-terraform/`
-- **Purpose:** Automates the creation and integration of modular AWS infrastructure.
-- **Key Features:**
-    - Dynamic version discovery from Terraform Registry.
-    - Strict Mumbai (ap-south-1) regional defaults.
-    - Automated remote state (S3/DynamoDB) configuration.
-- **Workflow:** **STOP-AND-ASK.** The agent must identify this skill and request user permission before execution.
+- **Purpose:** Automates the creation and integration of modular AWS infrastructure for microservices.
+- **Workflow:** **STOP-AND-ASK.**
+
+### scaffold-static-site
+- **Location:** `.agents/skills/scaffold-static-site/`
+- **Purpose:** Generates a complete Terraform configuration for S3 + CloudFront static site hosting with OAC security.
+- **Workflow:** **STOP-AND-ASK.** Supports argument overrides for region and project name.
+
+### tf-plan
+- **Location:** `.agents/skills/tf-plan/`
+- **Purpose:** Executes and analyzes Terraform plans for architectural and security risks.
+- **Workflow:** **STOP-AND-ASK.** Mandatory before applying any infrastructure changes.
 
 ## 7. Architectural Principles
 - **Event-Driven:** Async communication via **RabbitMQ Fanout Exchange** (`order_events`).
