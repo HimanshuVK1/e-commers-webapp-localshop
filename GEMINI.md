@@ -1,6 +1,12 @@
 # AGENTS.md - Technical Instruction Manual for LocalShop
 
-## 1. Project Overview
+## 1. Interaction Protocol
+**MANDATORY:** Before executing any tool or command, you MUST briefly explain what you're about to do in 1-2 simple sentences.
+- Use plain language; avoid jargon.
+- Explain **WHY**, not just what.
+- Proceed with the action only after providing this context.
+
+## 2. Project Overview
 **LocalShop** is a production-grade e-commerce microservices application. It is architected for cloud-native deployment on **AWS** using **Terraform** for infrastructure and **GitOps (ArgoCD)** for continuous delivery.
 
 - **Frontend:** Next.js 14 (App Router), Tailwind CSS, shadcn/ui, Zustand.
