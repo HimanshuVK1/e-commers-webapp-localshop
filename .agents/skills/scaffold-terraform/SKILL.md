@@ -1,0 +1,66 @@
+---
+name: scaffold-terraform
+description: Advanced AWS infrastructure management using modular Terraform. Use when creating or modifying modular AWS resources (VPC, EKS, RDS, etc.) to ensure adherence to LocalShop architectural standards.
+---
+
+# Terraform Expert
+# scaffold-terraform
+
+## 🔴 PERMISSION GATE
+**disable-model-invocation: true**
+- **CRITICAL:** Do NOT run or activate this skill on your own.
+- **MANDATE:** You MUST identify this skill to the user and ask for explicit permission before using any of its workflows or assets.
+
+## Core Directives
+
+
+1.  **Modularity:** Always create resources within `terraform/modules/<service-name>/`.
+2.  **Verified Modules:** Exclusively use community modules from **`terraform-aws-modules/*`**.
+3.  **File Consistency:** Every module MUST have exactly `main.tf`, `variables.tf`, and `outputs.tf`.
+4.  **Connectivity:** Connect modules only via variables and outputs.
+5.  **Versioning:** Fix all provider and module versions to specific releases.
+
+## Tooling & Discovery
+
+To maintain the infrastructure, use the following tools:
+- **`run_shell_command` (bash):** Execute `terraform fmt` after every edit. Use `terraform init` and `validate` to check new modules.
+- **`grep_search` / `glob`:** Use to discover dependencies between modules (e.g., finding where an `output` is used as a `variable`).
+- **`read_file` / `write_file` / `replace`:** Use for precise, surgical edits to Terraform configuration files.
+
+## Recipe Card: Modular Scaffolding Workflow
+
+You MUST execute the following phases in sequence. Do not skip steps.
+
+### Phase 1: Discovery (The 'Research' step)
+1.  Verify if the service exists in `terraform/modules/`.
+2.  Consult `references/naming-conventions.md` to determine the resource name.
+3.  **Policy Check:** Read and follow **`references/best-practices.md`** for state locking and versioning rules.
+4.  **CLI Version Check:** Use my internal search/script to find the latest stable Terraform CLI version and pin it in the root `providers.tf`.
+4.  **Architecture Check:** You MUST read and follow the relevant specification file before acting:
+    - **VPC:** `references/vpc-spec.md` (3-tier architecture).
+    - **EKS:** `references/eks-spec.md` (Security & IRSA).
+    - **RDS:** `references/rds-spec.md` (Subnet isolation & HA).
+5.  Check root `outputs.tf` for any existing resources this new module depends on.
+6.  **Backend Check:** If this is a new root environment, check for `backend.tf`. Use **Native S3 Locking** (`use_lockfile = true`) for the state.
+
+### Phase 2: Scaffolding (The 'Act' step)
+1.  Create `terraform/modules/<service-name>/`.
+2.  Copy all files from `assets/module-template/` to the new directory.
+3.  **Root Setup:** If configuring a new environment, copy `assets/backend.tf.tmpl` to the root `terraform/` directory.
+4.  **Run `node scripts/update_module_versions.cjs terraform-aws-modules/<service-name>/aws` to find the latest version.**
+5.  Populate `main.tf` using the official `terraform-aws-modules` source and the **VERSION_RESULT** from the script.
+
+### Phase 3: Dependency Linking (The 'Integration' step)
+1.  Declare required inputs in the new module's `variables.tf`.
+2.  Map those variables to outputs from existing modules in the root `main.tf`.
+3.  Export unique identifiers (ID/ARN) in the new module's `outputs.tf`.
+
+### Phase 4: Validation (The 'Sign-off' step)
+1.  Run `terraform fmt` on the new module.
+2.  Provide a Status Report:
+    - **Action:** Created/Modified [Service Name].
+    - **Links:** Mapped [X] inputs to [Y] outputs.
+    - **Security:** Verified non-root and distroless alignment.
+
+## References
+- Refer to `references/naming-conventions.md` for resource naming rules.

@@ -56,8 +56,16 @@ integration-test.js
 verify-images.js
 ecommers-webapp-design.txt
 
-# Allow interoperable agent skills
-.agents/
-
-# Ignore local .gemini session data
-.gemini/
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+_override.tf
+_override.tf.json
+.terraform.lock.hcl
