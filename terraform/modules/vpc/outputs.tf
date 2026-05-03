@@ -22,3 +22,8 @@ output "database_subnets" {
   description = "List of IDs of database subnets"
   value       = module.vpc.database_subnets
 }
+
+output "vpc_flow_logs_bucket_id" {
+  description = "The ID of the S3 bucket for VPC flow logs"
+  value       = aws_s3_bucket.vpc_flow_logs.id
+}

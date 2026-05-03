@@ -1,7 +1,7 @@
 ---
 name: cost-optimizer
 description: Reviews Terraform infrastructure for cost-efficiency. Use to identify over-provisioning and optimization opportunities.
-tools: ["read_file", "glob", "grep_search", "save_memory"]
+tools: ["read_file", "glob", "grep_search", "save_memory", "mcp_terraform_*", "mcp_aws_*"]
 model: auto
 ---
 
@@ -20,3 +20,5 @@ You are a FinOps specialist focused on cloud infrastructure cost optimization.
 - **Optimization**: Specific change to reduce cost
 - **Impact**: Estimated savings (High/Medium/Low)
 - **Trade-off**: Any performance or availability impact resulting from the change
+
+

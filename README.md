@@ -17,8 +17,14 @@ This repository is divided into three core pillars:
 This project uses the **Gemini CLI** to power an autonomous DevOps team. Our specialized subagents are configured to maintain project standards and security:
 
 - **`@tf-writer`**: Senior Terraform Engineer. Generates standardized, modular IaC with integrated MCP tools.
-- **`@security-auditor`**: AWS Security Specialist. Performs proactive audits against a strict 9-point security checklist.
-- **`@cost-optimizer`**: Cloud Cost Specialist. Analyzes infrastructure for savings and efficiency.
+- **`@security-auditor`**: AWS Security Specialist. Performs proactive audits and maintains a "Secure by Design" posture using Checkov and dynamic VPC hardening.
+- **`@cost-optimizer`**: Cloud Cost Specialist. Manages NAT Gateway and Endpoint costs, currently optimized for ~$103/mo in ap-south-1.
+
+### Security Posture (Verified):
+- ✅ **CloudTrail & VPC Flow Logs** (Audit Traceability)
+- ✅ **SSE-KMS Encryption** (Data Protection)
+- ✅ **VPC Interface Endpoints** (Network Isolation)
+- ✅ **S3 Versioning & Lifecycles** (Data Integrity)
 
 ### Key Skills:
 - `tf-plan`: Automated risk assessment and plan analysis.

@@ -33,11 +33,11 @@ Every push to the `main` branch triggers a multi-stage pipeline with strict **Ch
 5.  **Publish:** Verified images to Docker Hub.
 6.  **Deploy:** ArgoCD EKS synchronization.
 
-### Infrastructure as Code (Terraform)
-All infrastructure is located in the **`terraform/`** directory following a modular architecture.
-- **Structure:** `terraform/` (Root) and `terraform/modules/` (Child).
-- **Tooling:** Use `terraform-aws-modules/*`.
-- **Versioning:** Strictly fixed CLI (1.15.1) and Provider versions.
+### 3. Infrastructure & Security Mandates
+- **Network Isolation:** All critical services MUST use VPC Interface Endpoints (ECR, Secrets Manager) to avoid public internet traversal.
+- **Auditing:** CloudTrail (Control-Plane) and VPC Flow Logs (Data-Plane) are MANDATORY for all environments.
+- **Encryption:** All S3 buckets and CloudWatch groups MUST use SSE-KMS with Customer Managed Keys (CMK) and auto-rotation enabled.
+- **Data Integrity:** S3 versioning and lifecycle policies (Glacier IR transition) are required for all audit buckets.
 
 ## 4. Execution Commands (Relative to Root)
 

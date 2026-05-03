@@ -1,7 +1,7 @@
 ---
 name: security-auditor
 description: Audits Terraform infrastructure for security and compliance issues. Use proactively during IaC reviews.
-tools: ["read_file", "glob", "grep_search", "save_memory"]
+tools: ["read_file", "glob", "grep_search", "save_memory", "mcp_terraform_*", "mcp_aws_*"]
 model: pro
 ---
 

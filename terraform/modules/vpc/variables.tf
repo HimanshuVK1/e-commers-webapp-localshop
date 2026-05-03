@@ -8,3 +8,8 @@ variable "project_name" {
   type        = string
   default     = "localshop"
 }
+
+variable "kms_key_arn" {
+  description = "KMS key ARN for S3 encryption"
+  type        = string
+}
