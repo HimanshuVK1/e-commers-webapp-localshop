@@ -1,17 +1,30 @@
 # LocalShop | Premium E-Commerce Microservices
 
-<img src="frontend/public/logo.svg" width="120" alt="LocalShop Logo" />
+<img src="webapp/frontend/public/logo.svg" width="120" alt="LocalShop Logo" />
 
-LocalShop is a production-grade, fully functional e-commerce platform built with a microservices architecture. It is designed to run 100% locally using Docker Desktop while adhering to enterprise security and architectural standards.
+LocalShop is a production-grade, fully functional e-commerce platform built with a microservices architecture. It is designed for cloud-native scalability while maintaining a seamless local development experience.
 
 ## 🚀 Key Features
 
-- **Scalable Microservices:** 7 independent services + API Gateway.
+- **Clean Separation:** Isolated application code (`webapp/`) and infrastructure as code (`terraform/`).
+- **Scalable Microservices:** 8 independent services (including FastAPI) + API Gateway.
 - **Modern UI/UX:** Built with Next.js 14, Tailwind CSS, and `shadcn/ui`.
-- **Global Cart:** Modern slide-out sheet accessible from any page.
-- **Rich Catalog:** 40 premium products with high-resolution, verified visuals.
 - **Event-Driven:** Real-time inventory and notification updates via RabbitMQ.
 - **Production-Ready Docker:** Multi-stage builds, Distroless images, and non-root users.
+
+---
+
+## 🏗 Repository Structure
+
+```text
+.
+├── .agents/          # Interoperable AI agent skills
+├── terraform/        # Modular AWS Infrastructure (VPC, EKS, RDS)
+└── webapp/           # Application Source Code & Docker Orchestration
+    ├── frontend/     # Next.js 14 Dashboard
+    ├── gateway/      # API Gateway (Express)
+    └── services/     # Microservices (Node.js & FastAPI)
+```
 
 ---
 
@@ -19,64 +32,31 @@ LocalShop is a production-grade, fully functional e-commerce platform built with
 
 ### Frontend
 - **Next.js 14 (App Router):** Core React framework.
-- **Tailwind CSS:** Utility-first styling.
-- **shadcn/ui:** High-end UI component library.
+- **Tailwind CSS & shadcn/ui:** Styling and professional components.
 - **Zustand:** Lightweight state management.
-- **Lucide React:** Iconography.
 
 ### Backend Microservices
-- **Express.js (Node.js):** Standard framework for the Gateway and core Node services.
-- **FastAPI (Python):** High-performance framework used for the **Analytics** service.
-- **Sequelize (ORM):** Relational data management for **User** and **Order** services (PostgreSQL).
-- **Mongoose (ODM):** Document data management for **Product** and **Inventory** services (MongoDB).
-- **amqplib:** Robust messaging client for **RabbitMQ** event orchestration.
-- **Redis Client:** High-performance caching for the **Cart** service.
-- **JWT & Bcrypt:** Secure authentication and credential hashing.
-
----
-
-## 🏗 Architecture Overview
-Applied fuzzy match at line 35-50.
-The system consists of the following components:
-
-### Frontend
-- **Next.js (Standalone Mode):** Optimized React framework for high-performance delivery.
-- **Zustand:** Lightweight state management for cart and user sessions.
-
-### Gateway & Services
-1.  **API Gateway:** Single entry point using `http-proxy-middleware` with JWT authentication.
-2.  **User Service:** Handles registration, login, and profile management (PostgreSQL).
-3.  **Product Service:** Manages the product catalog and seeding (MongoDB).
-4.  **Cart Service:** Fast, volatile storage for user shopping carts (Redis).
-5.  **Order Service:** Manages transaction history and orchestrates events (PostgreSQL).
-6.  **Inventory Service:** Real-time stock management triggered by order events (MongoDB).
-7.  **Payment Service:** Simulated payment processing and verification.
-8.  **Notification Service:** Simulated email/SMS alerts for orders and payments.
-
-### Infrastructure
-- **PostgreSQL:** Relational data (Users, Orders).
-- **MongoDB:** Document-based data (Products, Inventory).
-- **Redis:** In-memory caching (Carts).
-- **RabbitMQ:** Message broker for asynchronous event-driven communication.
+- **Express.js (Node.js):** Core framework for Gateway and Node services.
+- **FastAPI (Python):** Used for high-performance **Analytics**.
+- **Sequelize & Mongoose:** ORM/ODM for PostgreSQL and MongoDB.
+- **amqplib:** RabbitMQ messaging client.
 
 ---
 
 ## 🛡 Security & Best Practices
 
-- **Distroless Images:** Containers contain *only* the application and its runtime. No shell or extra binaries (minimizes attack surface).
-- **Non-Root Execution:** All processes run under UID 65532 (nonroot).
-- **Credential Isolation:** Sensitive data is managed via localized `.env` files (ignored by Git).
-- **Multi-Stage Builds:** Ensures build-time secrets and source code are not included in final images.
-- **API Security:** Centralized JWT verification at the Gateway level.
-- **Signal Handling:** Configured with `init: true` for proper process management.
+- **Distroless Runtime:** Minimal attack surface with shell-free images.
+- **Non-Root Execution:** All containers run as restricted user (UID 65532).
+- **Native S3 Locking:** Modern, DynamoDB-free Terraform state management.
+- **Strict Versioning:** All CLI and provider versions are strictly pinned.
 
 ---
 
 ## 🛠 Getting Started
 
 ### Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac/Linux)
-- [Node.js 20+](https://nodejs.org/) (Optional, for local testing)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Terraform 1.15.1+](https://www.terraform.io/)
 
 ### Installation
 1.  **Clone the repository:**
@@ -85,44 +65,17 @@ The system consists of the following components:
     cd e-commers-webapp-localshop
     ```
 
-2.  **Configure Environment Variables:**
-    Copy all `.env.example` files to `.env` in their respective directories:
+2.  **Start the Webapp:**
     ```bash
-    cp .env.example .env
-    cp gateway/.env.example gateway/.env
-    # ... repeat for all services
-    ```
-
-3.  **Start the Application:**
-    ```bash
+    cd webapp
+    # Copy all .env.example files to .env in each sub-directory
     docker-compose up -d --build
     ```
 
-### Accessing the App
-- **Frontend:** [http://localhost:3000](http://localhost:3000)
-- **API Gateway:** [http://localhost:8000](http://localhost:8000)
-- **RabbitMQ Dashboard:** [http://localhost:15672](http://localhost:15672) (guest/guest)
-
 ---
-
-## 👨‍💻 Development
-
-### Adding Products
-To re-seed or expand the catalog, modify `services/product-service/src/seed.js` and restart the service:
-```bash
-docker-compose restart product-service
-```
-
-### Running Tests
-The project includes automated integration tests:
-```bash
-docker exec -it e-commers-webapp-gateway-1 node integration-test.js
-```
 
 ### Developer Context
-This project utilizes an **`AGENTS.md`** file to provide durable instructional context for AI agents (Gemini CLI, Cursor, Claude Code). Refer to this file for technical standards, check gates, and architecture rules.
-
----
+This project utilizes an **`AGENTS.md`** file to provide durable instructional context for AI agents. Refer to this file for technical standards, check gates, and architecture rules.
 
 ## 📜 License
-Applied fuzzy match at line 100-105.This project uses high-quality images from Unsplash under the [Unsplash License](https://unsplash.com/license).
+This project uses high-quality images from Unsplash under the [Unsplash License](https://unsplash.com/license).
