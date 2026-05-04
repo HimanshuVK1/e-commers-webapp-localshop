@@ -31,7 +31,7 @@
 ## 3. DevOps & CI/CD Workflow
 
 ### Service CI/CD Pipeline
-Every push to the `dev` branch triggers a multi-stage pipeline:
+Every push to the `dev` branch triggers a multi-stage pipeline. For full architectural details, see [cicdflow.md](cicdflow.md) and [ai_assistant.md](ai_assistant.md).
 1.  **Build & Push:** GitHub Actions builds Docker images and pushes to AWS ECR tagged with the Git SHA.
 2.  **GitOps Sync:** ArgoCD Image Updater detects new images in ECR and automatically updates the Deployment manifests in the cluster without requiring a Git commit.
 3.  **IaC CI/CD:** GitHub Actions runs `terraform plan` on PRs and `terraform apply` on pushes to `dev`.

@@ -60,6 +60,8 @@ Ensure you have the Gemini CLI installed and run the following to activate the w
 /skills reload
 /agents reload
 ```
+For detailed instructions on leveraging the EKS and GitHub MCP servers, refer to the [Agentic DevOps Guide](ai_assistant.md).
+For a comprehensive breakdown of the deployment pipeline, refer to the [CI/CD & GitOps Flow](cicdflow.md).
 
 ## 📜 License
 This project is for educational and prototype purposes. Application images used are under the Unsplash License.
