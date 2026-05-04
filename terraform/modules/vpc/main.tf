@@ -52,12 +52,12 @@ module "vpc" {
   map_public_ip_on_launch = false
 
   # VPC Flow Logs (S3)
-  enable_flow_log                       = true
-  create_flow_log_cloudwatch_log_group  = false
-  create_flow_log_cloudwatch_iam_role   = false
-  flow_log_destination_type             = "s3"
-  flow_log_destination_arn              = aws_s3_bucket.vpc_flow_logs.arn
-  flow_log_max_aggregation_interval     = 60
+  enable_flow_log                      = true
+  create_flow_log_cloudwatch_log_group = false
+  create_flow_log_cloudwatch_iam_role  = false
+  flow_log_destination_type            = "s3"
+  flow_log_destination_arn             = aws_s3_bucket.vpc_flow_logs.arn
+  flow_log_max_aggregation_interval    = 60
 
   # Default Security Group - Strip all rules
   manage_default_security_group  = true
@@ -150,7 +150,7 @@ data "aws_iam_policy_document" "vpc_flow_logs_policy" {
       type        = "Service"
       identifiers = ["delivery.logs.amazonaws.com"]
     }
-    actions = ["s3:PutObject"]
+    actions   = ["s3:PutObject"]
     resources = ["${aws_s3_bucket.vpc_flow_logs.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
     condition {
       test     = "StringEquals"
@@ -165,7 +165,7 @@ data "aws_iam_policy_document" "vpc_flow_logs_policy" {
       type        = "Service"
       identifiers = ["delivery.logs.amazonaws.com"]
     }
-    actions = ["s3:GetBucketAcl"]
+    actions   = ["s3:GetBucketAcl"]
     resources = [aws_s3_bucket.vpc_flow_logs.arn]
   }
 
@@ -192,9 +192,9 @@ data "aws_iam_policy_document" "vpc_flow_logs_policy" {
 # Custom S3 Endpoint Policy
 data "aws_iam_policy_document" "s3_endpoint_policy" {
   statement {
-    sid       = "AllowVpcFlowLogs"
-    effect    = "Allow"
-    actions   = ["s3:PutObject", "s3:GetBucketAcl"]
+    sid     = "AllowVpcFlowLogs"
+    effect  = "Allow"
+    actions = ["s3:PutObject", "s3:GetBucketAcl"]
     resources = [
       aws_s3_bucket.vpc_flow_logs.arn,
       "${aws_s3_bucket.vpc_flow_logs.arn}/*"
@@ -212,7 +212,7 @@ data "aws_iam_policy_document" "s3_endpoint_policy" {
       "s3:GetObject"
     ]
     resources = [
-      "arn:aws:s3:::prod-${data.aws_region.current.name}-starport-layer-bucket/*",
+      "arn:aws:s3:::prod-${data.aws_region.current.region}-starport-layer-bucket/*",
       "arn:aws:s3:::prod-us-east-1-starport-layer-bucket/*"
     ]
     principals {
@@ -250,7 +250,7 @@ resource "aws_s3_bucket_logging" "vpc_flow_logs" {
 # ECR API Endpoint
 resource "aws_vpc_endpoint" "ecr_api" {
   vpc_id              = module.vpc.vpc_id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.ecr.api"
+  service_name        = "com.amazonaws.${data.aws_region.current.region}.ecr.api"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   subnet_ids          = [module.vpc.private_subnets[0]] # Cost Optimized: Deploy in 1 AZ
@@ -262,7 +262,7 @@ resource "aws_vpc_endpoint" "ecr_api" {
 # ECR DKR Endpoint
 resource "aws_vpc_endpoint" "ecr_dkr" {
   vpc_id              = module.vpc.vpc_id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.ecr.dkr"
+  service_name        = "com.amazonaws.${data.aws_region.current.region}.ecr.dkr"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   subnet_ids          = [module.vpc.private_subnets[0]] # Cost Optimized: Deploy in 1 AZ
@@ -274,7 +274,7 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
 # S3 Gateway Endpoint (Manual)
 resource "aws_vpc_endpoint" "s3" {
   vpc_id            = module.vpc.vpc_id
-  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
+  service_name      = "com.amazonaws.${data.aws_region.current.region}.s3"
   vpc_endpoint_type = "Gateway"
   route_table_ids   = module.vpc.private_route_table_ids
   policy            = data.aws_iam_policy_document.s3_endpoint_policy.json
@@ -285,7 +285,7 @@ resource "aws_vpc_endpoint" "s3" {
 # Secrets Manager Endpoint
 resource "aws_vpc_endpoint" "secretsmanager" {
   vpc_id              = module.vpc.vpc_id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.secretsmanager"
+  service_name        = "com.amazonaws.${data.aws_region.current.region}.secretsmanager"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   subnet_ids          = [module.vpc.private_subnets[0]] # Cost Optimized: Deploy in 1 AZ

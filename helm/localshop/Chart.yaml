@@ -1,0 +1,47 @@
+apiVersion: v2
+name: localshop
+description: The main application umbrella chart deploying all 10 microservices
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: gateway
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: frontend
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: user-service
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: product-service
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: cart-service
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: order-service
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: inventory-service
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: payment-service
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: notification-service
+  - name: localshop-microservice
+    version: "0.1.0"
+    repository: "file://../localshop-microservice"
+    alias: analytics-service

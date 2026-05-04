@@ -1,0 +1,31 @@
+mongodb:
+  auth:
+    enabled: false # For development prototype. Use External Secrets for Prod.
+  persistence:
+    size: 2Gi
+
+redis:
+  auth:
+    enabled: false
+  master:
+    persistence:
+      size: 1Gi
+
+rabbitmq:
+  auth:
+    username: user
+    password: password
+  persistence:
+    size: 2Gi
+
+kube-prometheus-stack:
+  grafana:
+    enabled: true
+    adminPassword: admin
+
+loki-stack:
+  loki:
+    enabled: true
+    isDefault: false
+  promtail:
+    enabled: true
