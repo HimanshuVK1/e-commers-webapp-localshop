@@ -30,6 +30,7 @@ The infrastructure is primed for the **Amazon EKS Model Context Protocol (MCP) S
 - ✅ **SSE-KMS Encryption** (Data Protection)
 - ✅ **VPC Interface Endpoints** (Network Isolation)
 - ✅ **S3 Versioning & Lifecycles** (Data Integrity)
+- ✅ **External Secrets Operator** (Dynamic Secrets Injection via AWS Secrets Manager)
 
 ### Key Skills:
 - `tf-plan`: Automated risk assessment and plan analysis.

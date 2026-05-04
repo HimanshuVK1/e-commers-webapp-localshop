@@ -58,6 +58,15 @@ This document outlines the complete, automated path that code takes from a devel
 
 ---
 
+## 🔐 Secure Secrets Management (External Secrets Operator)
+
+To avoid hardcoding sensitive data (like database passwords), the pipeline uses the **External Secrets Operator (ESO)**:
+1. **Infrastructure Provisioning:** Terraform creates the RDS instance and instructs AWS to auto-generate a secure master password, storing it directly in **AWS Secrets Manager**.
+2. **ESO Authentication:** The External Secrets Operator is installed via ArgoCD and authenticates to AWS Secrets Manager using a strictly scoped IAM Role via IRSA (IAM Roles for Service Accounts).
+3. **Dynamic Injection:** When a microservice (e.g., `user-service`) is deployed, it defines an `ExternalSecret` manifest. ESO intercepts this, securely fetches the password from AWS, creates a native Kubernetes `Secret`, and the Helm chart injects it into the Pod as an environment variable. The password never touches GitHub or plain text.
+
+---
+
 ## 🛠 Manual Overrides & Bootstrapping
 
 ### The "Chicken or the Egg" Scenario (Day 1 Only)
