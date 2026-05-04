@@ -24,6 +24,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false # Prevents one failing build from cancelling the other parallel builds
       matrix:
         service: [gateway, frontend, user-service, product-service, cart-service, order-service, inventory-service, analytics-service, payment-service, notification-service]
     steps:
