@@ -3,7 +3,9 @@
     "eks": {
       "command": "uvx",
       "args": [
-        "amazon-eks-mcp-server"
+        "amazon-eks-mcp-server",
+        "--allow-write",
+        "--allow-sensitive-data-access"
       ],
       "env": {
         "AWS_REGION": "ap-south-1"
