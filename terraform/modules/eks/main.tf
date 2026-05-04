@@ -11,6 +11,14 @@ module "eks" {
   # Enable OIDC provider for IRSA
   enable_irsa = true
 
+  # Support for AWS EKS MCP Server (Agentic DevOps)
+  enable_cluster_creator_admin_permissions = true
+  authentication_mode                      = "API_AND_CONFIG_MAP"
+  cluster_endpoint_public_access           = true 
+  
+  # MCP Server requires Control Plane logs for autonomous troubleshooting
+  cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+
   # Cost Optimized Spot instances
   eks_managed_node_groups = {
     default = {

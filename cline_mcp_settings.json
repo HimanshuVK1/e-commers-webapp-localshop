@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "eks": {
+      "command": "uvx",
+      "args": [
+        "amazon-eks-mcp-server"
+      ],
+      "env": {
+        "AWS_REGION": "ap-south-1"
+      }
+    }
+  }
+}
