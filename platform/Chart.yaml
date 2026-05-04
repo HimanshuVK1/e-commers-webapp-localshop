@@ -19,3 +19,9 @@ dependencies:
   - name: loki-stack
     version: "2.x.x"
     repository: "https://grafana.github.io/helm-charts"
+  - name: argocd-image-updater
+    version: "0.10.x"
+    repository: "https://argoproj.github.io/argo-helm"
+  - name: external-secrets
+    version: "0.9.x"
+    repository: "https://charts.external-secrets.io"

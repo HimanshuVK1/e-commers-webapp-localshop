@@ -29,3 +29,17 @@ loki-stack:
     isDefault: false
   promtail:
     enabled: true
+
+argocd-image-updater:
+  config:
+    registries:
+      - name: ECR
+        api_url: https://970547369309.dkr.ecr.ap-south-1.amazonaws.com
+        prefix: 970547369309.dkr.ecr.ap-south-1.amazonaws.com
+        credentials: ext:/scripts/ecr-login.sh
+        cred_resolve: ecr-login
+
+external-secrets:
+  installCRDs: true
+  webhook:
+    port: 9443

@@ -41,5 +41,10 @@ spec:
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
+          {{- if .Values.secrets }}
+          envFrom:
+            - secretRef:
+                name: {{ include "localshop-microservice.fullname" . }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
