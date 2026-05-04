@@ -37,16 +37,12 @@ module "vpc" {
 
   # NAT Gateway for Private Subnet Internet Access
   enable_nat_gateway     = true
-  single_nat_gateway     = var.environment != "prod"
-  one_nat_gateway_per_az = var.environment == "prod"
+  single_nat_gateway     = true # Cost Optimized: Use a single NAT Gateway for the prototype
+  one_nat_gateway_per_az = false
 
   # DNS Support for Interface Endpoints
   enable_dns_hostnames = true
   enable_dns_support   = true
-
-  # VPC Endpoints
-  enable_s3_endpoint = true
-  s3_endpoint_policy = data.aws_iam_policy_document.s3_endpoint_policy.json
 
   # Database Subnet Security (Isolated)
   create_database_subnet_group       = true
@@ -60,7 +56,7 @@ module "vpc" {
   create_flow_log_cloudwatch_log_group  = false
   create_flow_log_cloudwatch_iam_role   = false
   flow_log_destination_type             = "s3"
-  flow_log_destination                  = aws_s3_bucket.vpc_flow_logs.arn
+  flow_log_destination_arn              = aws_s3_bucket.vpc_flow_logs.arn
   flow_log_max_aggregation_interval     = 60
 
   # Default Security Group - Strip all rules
@@ -94,12 +90,22 @@ resource "aws_s3_bucket_versioning" "vpc_flow_logs" {
   }
 }
 
+# Added S3 Event Notifications
+resource "aws_s3_bucket_notification" "vpc_flow_logs" {
+  bucket      = aws_s3_bucket.vpc_flow_logs.id
+  eventbridge = true
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "vpc_flow_logs" {
   bucket = aws_s3_bucket.vpc_flow_logs.id
 
   rule {
     id     = "flow-log-lifecycle"
     status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
 
     transition {
       days          = 90
@@ -233,13 +239,21 @@ resource "aws_security_group" "vpc_endpoints" {
   tags = local.tags
 }
 
+# 4. S3 Access Logging Configuration
+resource "aws_s3_bucket_logging" "vpc_flow_logs" {
+  bucket = aws_s3_bucket.vpc_flow_logs.id
+
+  target_bucket = var.s3_access_log_bucket_id
+  target_prefix = "vpc-flow-logs/"
+}
+
 # ECR API Endpoint
 resource "aws_vpc_endpoint" "ecr_api" {
   vpc_id              = module.vpc.vpc_id
   service_name        = "com.amazonaws.${data.aws_region.current.name}.ecr.api"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-  subnet_ids          = module.vpc.private_subnets
+  subnet_ids          = [module.vpc.private_subnets[0]] # Cost Optimized: Deploy in 1 AZ
   security_group_ids  = [aws_security_group.vpc_endpoints.id]
 
   tags = merge(local.tags, { Name = "ecr-api-endpoint" })
@@ -251,10 +265,21 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
   service_name        = "com.amazonaws.${data.aws_region.current.name}.ecr.dkr"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-  subnet_ids          = module.vpc.private_subnets
+  subnet_ids          = [module.vpc.private_subnets[0]] # Cost Optimized: Deploy in 1 AZ
   security_group_ids  = [aws_security_group.vpc_endpoints.id]
 
   tags = merge(local.tags, { Name = "ecr-dkr-endpoint" })
+}
+
+# S3 Gateway Endpoint (Manual)
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = module.vpc.vpc_id
+  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = module.vpc.private_route_table_ids
+  policy            = data.aws_iam_policy_document.s3_endpoint_policy.json
+
+  tags = merge(local.tags, { Name = "s3-endpoint" })
 }
 
 # Secrets Manager Endpoint
@@ -263,7 +288,7 @@ resource "aws_vpc_endpoint" "secretsmanager" {
   service_name        = "com.amazonaws.${data.aws_region.current.name}.secretsmanager"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-  subnet_ids          = module.vpc.private_subnets
+  subnet_ids          = [module.vpc.private_subnets[0]] # Cost Optimized: Deploy in 1 AZ
   security_group_ids  = [aws_security_group.vpc_endpoints.id]
 
   tags = merge(local.tags, { Name = "secretsmanager-endpoint" })

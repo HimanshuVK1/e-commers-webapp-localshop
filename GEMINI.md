@@ -39,11 +39,26 @@ Every push to the `main` branch triggers a multi-stage pipeline with strict **Ch
 5.  **Publish:** Verified images to Docker Hub.
 6.  **Deploy:** ArgoCD EKS synchronization.
 
-### 3. Infrastructure & Security Mandates
-- **Network Isolation:** All critical services MUST use VPC Interface Endpoints (ECR, Secrets Manager) to avoid public internet traversal.
-- **Auditing:** CloudTrail (Control-Plane) and VPC Flow Logs (Data-Plane) are MANDATORY for all environments.
-- **Encryption:** All S3 buckets and CloudWatch groups MUST use SSE-KMS with Customer Managed Keys (CMK) and auto-rotation enabled.
-- **Data Integrity:** S3 versioning and lifecycle policies (Glacier IR transition) are required for all audit buckets.
+### 4. Infrastructure & Security Mandates
+- **Zero-Root Resource Policy:** NO resources (`resource` blocks) are allowed in the root `terraform/main.tf`. The root file must exclusively contain `module` calls, `data` sources, and `locals`.
+- **AWS Service-Based Modularity:** Terraform modules MUST be named after the underlying **AWS Service** (e.g., `rds`, `documentdb`, `elasticache`), NOT the application service.
+- **Explicit Scaffolding:** NEVER add infrastructure for a new service or AWS component without a direct, explicit instruction from the user.
+- **Supply Chain Security:** Exclusively use `terraform-aws-modules/*` community modules. All module sources MUST use a Git URL with an exact commit hash (e.g., `source = "git::https://github.com/...git?ref=<hash>"`) instead of semantic version tags.
+- **Standardized File Structure:** EVERY module must consist of at least three files: `main.tf`, `variables.tf`, and `outputs.tf`. NO monolithic `main.tf` files.
+- **Security-by-Design (Checkov/CIS):** All infrastructure code must be written assuming strict enterprise security scans (e.g., Checkov, Trivy).
+- **Technical Integrity & Versioning:** 
+  - **Verification-First Rule:** Before proposing or implementing any architecture (e.g., state locking, networking, IAM), I MUST proactively search for the latest best practices, feature shifts, and deprecations for the specific versions pinned in this project (e.g., Terraform 1.15.1+).
+  - **No Legacy Assumptions:** I must not rely on historical "industry standards" (like DynamoDB locking) without first verifying if a more modern, native, or cost-effective alternative exists in the current version.
+  - **Version-Specific Docs:** When a module or provider is pinned, I must verify the available arguments by checking the `variables.tf` or specific documentation for that exact version/commit hash.
+  - **Stability First:** Prefer native Terraform resources for complex security policies to ensure long-term stability across module updates.
+
+#### Infrastructure Quality Gate (Pre-Implementation Checklist)
+1.  [ ] Is the module named after an AWS Service (e.g., `rds`) and not an app service (e.g., `user-service`)?
+2.  [ ] Does the module use a verified community source pinned to a strict Git commit hash?
+3.  [ ] Is the file structure split into `main.tf`, `variables.tf`, and `outputs.tf`?
+4.  [ ] Does the root `main.tf` remain free of `resource` blocks?
+5.  [ ] Has the user given an explicit, direct instruction to scaffold this specific component?
+6.  [ ] Does the code proactively implement security best practices to pass enterprise static analysis tools (e.g., Checkov)?
 
 ## 4. Execution Commands (Relative to Root)
 

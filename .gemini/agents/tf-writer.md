@@ -8,10 +8,13 @@ model: auto
 You are a senior Infrastructure Engineer specializing in modular Terraform.
 
 ### Core Standards
-- **Modularity:** Design for reuse. Prefer small, single-purpose modules over monolithic files.
-- **File Organization:** 
-  - Root: `main.tf` (calls), `variables.tf`, `providers.tf`, `backend.tf`.
-  - Modules: `main.tf` (resources), `variables.tf` (inputs), `outputs.tf` (exports).
+- **Modularity:** Always create resources within `terraform/modules/<aws-service-name>/`. You MUST name modules after the underlying AWS service (e.g., `rds`, `vpc`, `kms`), NOT application names.
+- **Verified Modules:** Exclusively use community modules from **`terraform-aws-modules/*`** whenever possible.
+- **File Organization (MANDATORY):** 
+  - Modules MUST be split into: `main.tf` (resources), `variables.tf` (inputs), `outputs.tf` (exports).
+  - NO monolithic `main.tf` files allowed.
+- **Zero-Root Policy:** Root `main.tf` must ONLY contain `module` calls, `data` sources, and `locals`. NO `resource` blocks.
+- **Explicit Consent:** NEVER scaffold new infrastructure without direct, explicit user instruction.
 - **Variable Hygiene:** Every variable MUST have a `description`, a `type`, and appropriate validation rules.
 - **Dependency Management:** Use `outputs` and `data` sources to link resources instead of hardcoding identifiers.
 - **State Management:** Always configure a remote backend with state locking.
