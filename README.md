@@ -8,15 +8,18 @@ A production-grade, microservices-based e-commerce platform with integrated **Ag
 
 This repository is divided into three core pillars:
 
-1.  **Infrastructure (`/terraform`)**: Modular AWS Infrastructure as Code using `terraform-aws-modules`. Features 3-tier networking, EKS, and RDS isolation.
-2.  **Application (`/webapp`)**: A distributed microservices system consisting of 8 services (Node.js/FastAPI), a Next.js 14 frontend, and RabbitMQ messaging.
-3.  **Operations (`/.gemini`)**: An autonomous DevOps workspace containing specialized AI Skills and Subagents.
+1.  **Infrastructure (`/terraform`)**: Modular AWS Infrastructure as Code using `terraform-aws-modules`. Features 3-tier networking, EKS (Spot Instances), Single-AZ RDS, and automated ArgoCD bootstrapping. Configured for **Agentic DevOps** using the Amazon EKS MCP Server.
+2.  **Application (`/webapp` & `/helm`)**: A distributed microservices system consisting of 8 services (Node.js/FastAPI), a Next.js 14 frontend, and RabbitMQ messaging, packaged via custom Helm charts.
+3.  **GitOps (`/platform` & `/argocd`)**: Automated CD via ArgoCD and ArgoCD Image Updater, monitoring ECR registries for new builds.
 
 ---
 
 ## 🤖 Agentic DevOps Workspace
 
-This project uses the **Gemini CLI** to power an autonomous DevOps team. Our specialized subagents are configured to maintain project standards and security:
+This project uses the **Gemini CLI** to power an autonomous DevOps team. Our specialized subagents are configured to maintain project standards and security.
+
+### EKS MCP Server Integration
+The infrastructure is primed for the **Amazon EKS Model Context Protocol (MCP) Server**. This allows AI coding assistants to securely interface with the EKS API and CloudWatch logs for autonomous cluster troubleshooting and resource management using natural language.
 
 - **`@tf-writer`**: Senior Terraform Engineer. Generates standardized, modular IaC with integrated MCP tools.
 - **`@security-auditor`**: AWS Security Specialist. Performs proactive audits and maintains a "Secure by Design" posture using Checkov and dynamic VPC hardening.

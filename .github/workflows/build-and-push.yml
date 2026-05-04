@@ -3,12 +3,12 @@ name: Build and Push Microservices
 on:
   push:
     branches:
-      - main
+      - dev
     paths:
       - 'webapp/**'
   pull_request:
     branches:
-      - main
+      - dev
     paths:
       - 'webapp/**'
 
@@ -41,12 +41,10 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and Push
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
         run: |
           cd webapp/${{ matrix.service }} || cd webapp/services/${{ matrix.service }} || exit 1
           IMAGE_TAG=${{ github.sha }}
           REPOSITORY=${{ env.ECR_REGISTRY }}/localshop-${{ matrix.service }}
           docker build -t $REPOSITORY:$IMAGE_TAG .
           docker push $REPOSITORY:$IMAGE_TAG
-          docker tag $REPOSITORY:$IMAGE_TAG $REPOSITORY:latest
-          docker push $REPOSITORY:latest
