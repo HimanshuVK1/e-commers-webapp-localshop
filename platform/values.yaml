@@ -43,3 +43,8 @@ external-secrets:
   installCRDs: true
   webhook:
     port: 9443
+  serviceAccount:
+    create: true
+    name: "external-secrets"
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::970547369309:role/localshop-dev-external-secrets"
