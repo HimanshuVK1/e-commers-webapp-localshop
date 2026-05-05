@@ -15,3 +15,18 @@ variable "project_name" {
   type        = string
   default     = "localshop"
 }
+
+variable "github_repo" {
+  description = "GitHub repository (format: owner/repo)"
+  type        = string
+  default     = "HimanshuVK1/e-commers-webapp-localshop"
+}
+
+variable "db_password" {
+  description = "Password for the RDS master user"
+  type        = string
+  sensitive   = true
+  default     = "SuperSecret123!" # Override via TF_VAR_db_password
+}
+
+

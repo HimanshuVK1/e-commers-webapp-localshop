@@ -1,0 +1,100 @@
+global:
+  ecrRegistry: "970547369309.dkr.ecr.ap-south-1.amazonaws.com"
+  imageTag: "latest"
+
+gateway:
+  nameOverride: "gateway"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-gateway"
+    tag: "{{ .Values.global.imageTag }}"
+  service:
+    port: 8000
+    targetPort: 8000
+
+frontend:
+  nameOverride: "frontend"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-frontend"
+    tag: "{{ .Values.global.imageTag }}"
+  service:
+    port: 80
+    targetPort: 3000
+  ingress:
+    enabled: true
+    hosts:
+      - host: localshop.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+user-service:
+  nameOverride: "user-service"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-user-service"
+  service:
+    port: 8001
+    targetPort: 8001
+  env:
+    DB_HOST: "localshop-rds.xxx.ap-south-1.rds.amazonaws.com" # Update via ArgoCD later
+
+product-service:
+  nameOverride: "product-service"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-product-service"
+  service:
+    port: 8002
+    targetPort: 8002
+  env:
+    MONGO_URI: "mongodb://localshop-platform-mongodb:27017/products"
+
+cart-service:
+  nameOverride: "cart-service"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-cart-service"
+  service:
+    port: 8003
+    targetPort: 8003
+  env:
+    REDIS_HOST: "localshop-platform-redis-master"
+
+order-service:
+  nameOverride: "order-service"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-order-service"
+  service:
+    port: 8004
+    targetPort: 8004
+  env:
+    RABBITMQ_URL: "amqp://user:password@localshop-platform-rabbitmq:5672"
+
+inventory-service:
+  nameOverride: "inventory-service"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-inventory-service"
+  service:
+    port: 8006
+    targetPort: 8006
+
+payment-service:
+  nameOverride: "payment-service"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-payment-service"
+  service:
+    port: 8005
+    targetPort: 8005
+
+notification-service:
+  nameOverride: "notification-service"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-notification-service"
+  service:
+    port: 8007
+    targetPort: 8007
+
+analytics-service:
+  nameOverride: "analytics-service"
+  image:
+    repository: "{{ .Values.global.ecrRegistry }}/localshop-analytics-service"
+  service:
+    port: 8008
+    targetPort: 8008

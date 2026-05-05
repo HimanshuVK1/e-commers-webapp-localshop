@@ -1,0 +1,27 @@
+apiVersion: v2
+name: localshop-platform
+description: Platform dependencies for LocalShop (MongoDB, Redis, RabbitMQ, Observability)
+type: application
+version: 0.1.0
+dependencies:
+  - name: mongodb
+    version: "14.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: redis
+    version: "18.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: rabbitmq
+    version: "12.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: kube-prometheus-stack
+    version: "56.x.x"
+    repository: "https://prometheus-community.github.io/helm-charts"
+  - name: loki-stack
+    version: "2.x.x"
+    repository: "https://grafana.github.io/helm-charts"
+  - name: argocd-image-updater
+    version: "0.10.x"
+    repository: "https://argoproj.github.io/argo-helm"
+  - name: external-secrets
+    version: "0.9.x"
+    repository: "https://charts.external-secrets.io"

@@ -31,11 +31,12 @@ async function connectWithRetry() {
 // Routes
 app.get('/', async (req, res) => {
   try {
-    const { category, minPrice, maxPrice, sort, page = 1 } = req.query;
+    const { category, minPrice, maxPrice, sort, search, page = 1 } = req.query;
     const limit = Number(req.query.limit) || 50;
     
     const query = {};
     if (category) query.category = category;
+    if (search) query.$text = { $search: search };
     if (minPrice || maxPrice) {
       query.price = {};
       if (minPrice) query.price.$gte = Number(minPrice);
@@ -43,9 +44,15 @@ app.get('/', async (req, res) => {
     }
 
     const sortOption = {};
-    if (sort === 'price_asc') sortOption.price = 1;
-    else if (sort === 'price_desc') sortOption.price = -1;
-    else if (sort === 'rating') sortOption.rating = -1;
+    if (search && !sort) {
+      sortOption.score = { $meta: 'textScore' };
+    } else if (sort === 'price_asc') {
+      sortOption.price = 1;
+    } else if (sort === 'price_desc') {
+      sortOption.price = -1;
+    } else if (sort === 'rating') {
+      sortOption.rating = -1;
+    }
 
     const products = await Product.find(query)
       .sort(sortOption)

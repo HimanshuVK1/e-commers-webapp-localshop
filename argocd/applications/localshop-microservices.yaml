@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: localshop-microservices
+  namespace: argocd
+spec:
+  project: localshop
+  source:
+    repoURL: 'https://github.com/HimanshuVK1/e-commers-webapp-localshop.git'
+    path: helm/localshop
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: localshop
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,7 +1,7 @@
 # --- Centralized S3 Access Logging Bucket ---
 
 module "s3_access_logs" {
-  source  = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=5b923af1ae46e7d073e2b135c303b7c1e0dc54a6"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=5b923af1ae46e7d073e2b135c303b7c1e0dc54a6"
 
   bucket        = "localshop-${var.environment}-s3-access-logs-${var.account_id}"
   force_destroy = true
