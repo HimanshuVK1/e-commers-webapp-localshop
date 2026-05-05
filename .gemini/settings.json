@@ -1,21 +1,39 @@
 {
   "mcpServers": {
-    "terraform": {
-      "command": "docker",
+    "github": {
+      "command": "npx",
       "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-v", "${PWD}/terraform:/workspace",
-        "-w", "/workspace",
-        "hashicorp/terraform-mcp-server:latest"
+        "-y",
+        "@modelcontextprotocol/server-github"
       ],
-      "trust": true
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "$GITHUB_PERSONAL_ACCESS_TOKEN"
+      }
     },
     "aws": {
-      "command": "uvx",
-      "args": ["awslabs.aws-api-mcp-server@latest"],
-      "trust": true
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-aws-resources"
+      ]
+    },
+    "terraform": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-terraform"
+      ]
+    },
+    "eks": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-eks"
+      ],
+      "env": {
+        "EKS_CLUSTER_NAME": "localshop-dev",
+        "EKS_REGION": "ap-south-1"
+      }
     }
   }
 }

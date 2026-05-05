@@ -73,3 +73,6 @@ terraform/tfplan
 
 # Additional Design/Temp Files
 ecommers-webapp-design.txt
+
+# NPX Cache
+.npx-cache/

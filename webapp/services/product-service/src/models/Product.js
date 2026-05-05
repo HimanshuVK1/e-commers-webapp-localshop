@@ -10,4 +10,6 @@ const productSchema = new mongoose.Schema({
   images: [String]
 }, { timestamps: true });
 
+productSchema.index({ name: 'text', description: 'text' });
+
 module.exports = mongoose.model('Product', productSchema);

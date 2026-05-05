@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useCartStore } from '@/store/useCartStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ShoppingCart, Star, Zap, ArrowRight } from 'lucide-react';
+import { ShoppingCart, Star, Zap, ArrowRight, X } from 'lucide-react';
 
 export default function Home() {
   const [products, setProducts] = useState<any[]>([]);
@@ -15,19 +16,24 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('all');
   const addItem = useCartStore((state) => state.addItem);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const searchQuery = searchParams.get('search');
   
   const productsRef = useRef<HTMLDivElement>(null);
   const categoriesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api.get('/products?limit=50')
+    setLoading(true);
+    const searchPart = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
+    api.get(`/products?limit=50${searchPart}`)
       .then((res) => {
         setProducts(res.data.data);
         setFilteredProducts(res.data.data);
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [searchQuery]);
 
   useEffect(() => {
     if (category === 'all') {
@@ -36,6 +42,12 @@ export default function Home() {
       setFilteredProducts(products.filter(p => p.category.toLowerCase() === category.toLowerCase()));
     }
   }, [category, products]);
+
+  const clearSearch = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('search');
+    router.push(`/?${params.toString()}`);
+  };
 
   const handleAddToCart = async (product: any) => {
     try {
@@ -99,15 +111,29 @@ export default function Home() {
 
       {/* Product Grid */}
       <section ref={productsRef} className="space-y-10 scroll-mt-24">
-        <div className="flex items-end justify-between border-b pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between border-b pb-6 gap-4">
           <div className="space-y-1">
             <h3 className="text-3xl font-bold tracking-tight">
               {category === 'all' ? 'All Products' : `${category.charAt(0).toUpperCase() + category.slice(1)}`}
             </h3>
+            {searchQuery && (
+              <div className="flex items-center gap-2 text-blue-600 font-medium">
+                <span>Search results for "{searchQuery}"</span>
+                <button 
+                  onClick={clearSearch}
+                  className="p-1 hover:bg-blue-50 rounded-full transition-colors"
+                  title="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
             <p className="text-muted-foreground">Showing {filteredProducts.length} premium items.</p>
-
           </div>
-          <Button variant="outline" className="rounded-full font-bold border-2" onClick={() => setCategory('all')}>
+          <Button variant="outline" className="rounded-full font-bold border-2" onClick={() => {
+            setCategory('all');
+            if (searchQuery) clearSearch();
+          }}>
             Reset Filters
           </Button>
         </div>
