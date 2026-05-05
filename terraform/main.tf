@@ -38,75 +38,74 @@ module "vpc" {
   s3_access_log_bucket_id = module.logging.bucket_id
 }
 
-# 4. Security Module (CloudTrail)
-module "security" {
-  source = "./modules/security"
+# # 4. Security Module (CloudTrail)
+# module "security" {
+#   source = "./modules/security"
+# 
+#   project_name            = var.project_name
+#   environment             = var.environment
+#   account_id              = local.account_id
+#   kms_logs_key_arn        = module.kms.logs_key_arn
+#   kms_cloudtrail_key_arn  = module.kms.cloudtrail_key_arn
+#   s3_access_log_bucket_id = module.logging.bucket_id
+# }
 
-  project_name            = var.project_name
-  environment             = var.environment
-  account_id              = local.account_id
-  kms_logs_key_arn        = module.kms.logs_key_arn
-  kms_cloudtrail_key_arn  = module.kms.cloudtrail_key_arn
-  s3_access_log_bucket_id = module.logging.bucket_id
-}
+# # 5. IAM Module (GitHub Actions OIDC)
+# module "iam" {
+#   source = "./modules/iam"
+# 
+#   environment = var.environment
+#   github_repo = var.github_repo
+# }
 
-# 5. IAM Module (GitHub Actions OIDC)
-module "iam" {
-  source = "./modules/iam"
+# # 6. ECR Module
+# module "ecr" {
+#   source = "./modules/ecr"
+# 
+#   project_name = var.project_name
+#   environment  = var.environment
+# }
 
-  environment = var.environment
-  github_repo = var.github_repo
-}
+# # 7. EKS Module
+# module "eks" {
+#   source = "./modules/eks"
+# 
+#   project_name    = var.project_name
+#   environment     = var.environment
+#   vpc_id          = module.vpc.vpc_id
+#   private_subnets = module.vpc.private_subnets
+# }
 
-# 6. ECR Module
-module "ecr" {
-  source = "./modules/ecr"
+# # 8. RDS Module (PostgreSQL)
+# module "rds" {
+#   source = "./modules/rds"
+# 
+#   project_name     = var.project_name
+#   environment      = var.environment
+#   vpc_id           = module.vpc.vpc_id
+#   database_subnets = module.vpc.database_subnets
+#   db_password      = var.db_password
+# }
 
-  project_name = var.project_name
-  environment  = var.environment
-}
+# # --- EKS Authentication & Helm Provider ---
+# 
+# data "aws_eks_cluster_auth" "cluster" {
+#   name = module.eks.cluster_name
+# }
+# 
+# provider "helm" {
+#   kubernetes {
+#     host                   = module.eks.cluster_endpoint
+#     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+#     token                  = data.aws_eks_cluster_auth.cluster.token
+#   }
+# }
 
-# 7. EKS Module
-module "eks" {
-  source = "./modules/eks"
-
-  project_name    = var.project_name
-  environment     = var.environment
-  vpc_id          = module.vpc.vpc_id
-  private_subnets = module.vpc.private_subnets
-}
-
-# 8. RDS Module (PostgreSQL)
-module "rds" {
-  source = "./modules/rds"
-
-  project_name     = var.project_name
-  environment      = var.environment
-  vpc_id           = module.vpc.vpc_id
-  database_subnets = module.vpc.database_subnets
-  db_password      = var.db_password
-}
-
-# --- EKS Authentication & Helm Provider ---
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_name
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = module.eks.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-    token                  = data.aws_eks_cluster_auth.cluster.token
-  }
-}
-
-# 9. ArgoCD Bootstrap Module
-module "argocd" {
-  source = "./modules/argocd"
-
-  github_repo = var.github_repo
-
-  depends_on = [module.eks]
-}
-
+# # 9. ArgoCD Bootstrap Module
+# module "argocd" {
+#   source = "./modules/argocd"
+# 
+#   github_repo = var.github_repo
+# 
+#   depends_on = [module.eks]
+# }
