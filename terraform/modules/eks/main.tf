@@ -65,18 +65,34 @@ module "eks" {
 
 }
 
-module "external_secrets_irsa" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=1d73bcb359419e1b41872ac5ccaf8808b8f1150e"
+resource "aws_iam_role" "external_secrets_irsa" {
+  name_prefix = "localshop-${var.environment}-external-secrets-irsa-"
 
-  name = "${var.project_name}-${var.environment}-external-secrets"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${module.eks.oidc_provider_extract_from_arn}:sub" = "system:serviceaccount:external-secrets:external-secrets"
+          }
+        }
+      },
+    ]
+  })
 
-  attach_external_secrets_policy = true
-  attach_policy                  = false # Fixes "Invalid count argument" error
-
-  oidc_providers = {
-    ex = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["external-secrets:external-secrets"]
-    }
+  tags = {
+    Name        = "external-secrets-irsa-role"
+    Environment = var.environment
   }
+}
+
+resource "aws_iam_role_policy_attachment" "external_secrets_irsa_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite" # Example policy
+  role       = aws_iam_role.external_secrets_irsa.name
 }
