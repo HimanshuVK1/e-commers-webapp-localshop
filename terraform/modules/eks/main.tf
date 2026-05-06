@@ -29,7 +29,7 @@ module "eks" {
       max_size       = 3
       desired_size   = 2
       # Explicitly provide the node role ARN created in the IAM module
-      node_role_arn = module.iam.eks_node_group_role_arn
+      node_role_arn = var.eks_node_group_role_arn
     }
   }
 
