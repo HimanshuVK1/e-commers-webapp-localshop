@@ -45,9 +45,23 @@ jobs:
         run: terraform validate
         working-directory: ${{ env.TF_WORKING_DIR }}
 
+  security-scan:
+    name: 'Security Scan'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ${{ env.TF_WORKING_DIR }}
+          quiet: true
+          framework: terraform
+
   plan:
     name: 'Plan'
-    needs: validate
+    needs: [validate, security-scan]
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
@@ -75,7 +89,7 @@ jobs:
 
   apply:
     name: 'Apply'
-    needs: validate
+    needs: [validate, security-scan]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
     steps:
