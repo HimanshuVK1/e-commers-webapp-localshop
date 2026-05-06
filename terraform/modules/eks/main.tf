@@ -30,6 +30,10 @@ module "eks" {
       desired_size   = 2
       # Explicitly provide the node role ARN created in the IAM module
       node_role_arn = var.eks_node_group_role_arn
+      # Prevent EKS module from creating its own instance profile
+      create_launch_template = false
+      launch_template_name   = null
+      instance_profile_name  = null
     }
   }
 
