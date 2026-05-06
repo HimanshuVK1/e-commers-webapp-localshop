@@ -22,10 +22,10 @@ module "kms" {
 module "logging" {
   source = "./modules/logging"
 
-  project_name = var.project_name
-  environment  = var.environment
-  account_id   = local.account_id
-  kms_key_arn  = module.kms.logs_key_arn
+  project_name            = var.project_name
+  environment             = var.environment
+  account_id              = local.account_id
+  kms_key_arn             = module.kms.logs_key_arn
   s3_access_log_bucket_id = "temp-value" # Dummy value, will fix later.
 }
 
