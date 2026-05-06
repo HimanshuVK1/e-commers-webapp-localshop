@@ -71,11 +71,12 @@ module "ecr" {
 module "eks" {
   source = "./modules/eks"
 
-  project_name          = var.project_name
-  environment           = var.environment
-  vpc_id                = module.vpc.vpc_id
-  private_subnets       = module.vpc.private_subnets
-  eks_node_group_role_arn = module.iam.eks_node_group_role_arn
+  project_name                        = var.project_name
+  environment                         = var.environment
+  vpc_id                              = module.vpc.vpc_id
+  private_subnets                     = module.vpc.private_subnets
+  eks_node_group_role_arn             = module.iam.eks_node_group_role_arn
+  eks_node_group_instance_profile_arn = module.iam.eks_node_group_instance_profile_arn
 }
 
 # 8. RDS Module (PostgreSQL)

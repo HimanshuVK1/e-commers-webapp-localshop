@@ -31,7 +31,7 @@ module "eks" {
 
       # Explicitly provide the node role ARN created in the IAM module
       node_role_arn = var.eks_node_group_role_arn
-      instance_profile_arns = [module.iam.eks_node_group_instance_profile_arn]
+      instance_profile_arns = [var.eks_node_group_instance_profile_arn]
       # Letting the module manage the launch template ensures correct security group attachments
       create_launch_template = true
       
