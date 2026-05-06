@@ -1,60 +1,98 @@
-# --- Centralized S3 Access Logging Bucket ---
-
-module "s3_access_logs" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5"
-
+resource "aws_s3_bucket" "access_logs" {
   bucket        = "localshop-${var.environment}-access-logs-${var.account_id}"
   force_destroy = true
-
-  # Versioning
-  versioning = {
-    status = "Enabled"
-  }
-
-  # Lifecycle Rules
-  lifecycle_rule = [
-    {
-      id      = "log-lifecycle"
-      enabled = true
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "GLACIER_IR"
-        }
-      ]
-
-      expiration = {
-        days = 365
-      }
-    }
-  ]
-
-  # Encryption
-  server_side_encryption_configuration = {
-    rule = {
-      apply_server_side_encryption_by_default = {
-        kms_master_key_id = var.kms_key_arn
-        sse_algorithm     = "aws:kms"
-      }
-    }
-  }
-
-  # Access Log Delivery Policy
-  attach_access_log_delivery_policy          = true
-  access_log_delivery_policy_source_accounts = [var.account_id]
-
-  # Security Hardening
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-
-  # Deny Non-SSL Requests
-  attach_deny_insecure_transport_policy = true
 
   tags = {
     Project     = var.project_name
     Environment = var.environment
   }
+}
+
+resource "aws_s3_bucket_versioning" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  rule {
+    id     = "log-lifecycle"
+    status = "Enabled"
+
+    transition {
+      days          = 90
+      storage_class = "GLACIER_IR"
+    }
+
+    expiration {
+      days = 365
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = var.kms_key_arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowLogDelivery"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.access_logs.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = var.account_id
+          }
+        }
+      },
+      {
+        Sid    = "DenyNonSSL"
+        Effect = "Deny"
+        Principal = {
+          AWS = "*"
+        }
+        Action   = "s3:*"
+        Resource = [
+          aws_s3_bucket.access_logs.arn,
+          "${aws_s3_bucket.access_logs.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+output "bucket_id" {
+  value = aws_s3_bucket.access_logs.id
 }
