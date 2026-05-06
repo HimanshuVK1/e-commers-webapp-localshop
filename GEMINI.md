@@ -5,6 +5,8 @@
 - Use plain language; avoid jargon.
 - Explain **WHY**, not just what.
 - Proceed with the action only after providing this context.
+- **STRICT MCP MANDATE:** You MUST exclusively use the provided Model Context Protocol (MCP) tools for interacting with external systems, APIs, or infrastructure state whenever an applicable tool is available. **NEVER** bypass the MCP servers by falling back to raw shell commands (e.g., using `curl`, raw CLIs, or local CLI executions) for these tasks. If an MCP tool fails, you must troubleshoot the tool's parameters or syntax rather than abandoning it for a shell workaround.
+- **NATIVE RESOURCE MANDATE:** While we prioritize verified community modules for standard infrastructure (e.g., EKS, VPC), you MUST refactor to native Terraform resources if a community module consistently triggers deprecation warnings, maintenance overhead, or violates security standards. Prefer simple, direct resource definitions over complex, opaque community abstractions when high control or long-term stability is needed.
 
 ## 2. Project Overview
 **LocalShop** is a production-grade e-commerce microservices application. It is architected for cloud-native deployment on **AWS** using **Terraform** for infrastructure and **GitOps (ArgoCD)** for continuous delivery.
