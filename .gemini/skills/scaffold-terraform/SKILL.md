@@ -20,6 +20,7 @@ description: Advanced AWS infrastructure management using modular Terraform. Use
 4.  **File Consistency:** Every module MUST have exactly `main.tf`, `variables.tf`, and `outputs.tf`.
 5.  **Connectivity:** Connect modules only via variables and outputs.
 6.  **Versioning:** Fix all provider and module versions to specific releases (commit hashes).
+7.  **VPC Endpoints & Service Bootstrapping:** When implementing custom VPC Endpoint policies (e.g., S3 Gateway), you MUST explicitly whitelist the hidden, service-owned buckets or endpoints required for resource bootstrapping (e.g., `amazon-eks-*` for EKS nodes, or specific regional buckets for other AWS services). Overtightening endpoint policies causes silent communication failures, resulting in infinite "Still creating..." timeout loops during infrastructure provisioning.
 
 ## Tooling & Discovery
 
