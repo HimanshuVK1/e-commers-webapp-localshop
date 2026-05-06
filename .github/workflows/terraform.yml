@@ -21,9 +21,35 @@ env:
   TF_WORKING_DIR: 'terraform'
 
 jobs:
-  validate-and-plan:
-    name: 'Validate & Plan'
+  validate:
+    name: 'Validate'
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.1
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Format
+        run: terraform fmt -check
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  plan:
+    name: 'Plan'
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,29 +69,13 @@ jobs:
         run: terraform init
         working-directory: ${{ env.TF_WORKING_DIR }}
 
-      - name: Terraform Format
-        run: terraform fmt -check
-        working-directory: ${{ env.TF_WORKING_DIR }}
-
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: ${{ env.TF_WORKING_DIR }}
-
       - name: Terraform Plan
-        if: github.event_name == 'pull_request'
         run: terraform plan -input=false
         working-directory: ${{ env.TF_WORKING_DIR }}
 
-      - name: Upload Plan Artifact
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
-        with:
-          name: tf-plan
-          path: ${{ env.TF_WORKING_DIR }}/.terraform.lock.hcl
-
   apply:
     name: 'Apply'
-    needs: validate-and-plan
+    needs: validate
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
     steps:
