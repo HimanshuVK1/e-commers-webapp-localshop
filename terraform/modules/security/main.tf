@@ -1,95 +1,12 @@
-# --- CloudTrail S3 Bucket ---
+module "cloudtrail_bucket_native" {
+  source = "./s3_native"
 
-module "cloudtrail_bucket" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5"
-
-  bucket        = "localshop-${var.environment}-cloudtrail-logs-${var.account_id}"
-  force_destroy = true
-
-  # Versioning
-  versioning = {
-    status = "Enabled"
-  }
-
-  # Lifecycle Rules
-  lifecycle_rule = [
-    {
-      id      = "trail-lifecycle"
-      enabled = true
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "GLACIER_IR"
-        }
-      ]
-
-      expiration = {
-        days = 365
-      }
-    }
-  ]
-
-  # Encryption
-  server_side_encryption_configuration = {
-    rule = {
-      apply_server_side_encryption_by_default = {
-        kms_master_key_id = var.kms_logs_key_arn
-        sse_algorithm     = "aws:kms"
-      }
-    }
-  }
-
-  # Bucket Policy for CloudTrail
-  attach_policy = true
-  policy        = data.aws_iam_policy_document.cloudtrail_logs_policy.json
-
-  # S3 Access Logging
-  logging = {
-    target_bucket = var.s3_access_log_bucket_id
-    target_prefix = "cloudtrail-logs/"
-  }
-
-  # Security Hardening
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-
-  # Deny Non-SSL Requests
-  attach_deny_insecure_transport_policy = true
-
-  tags = {
-    Project     = var.project_name
-    Environment = var.environment
-  }
-}
-
-data "aws_iam_policy_document" "cloudtrail_logs_policy" {
-  statement {
-    sid = "AWSCloudTrailAclCheck"
-    principals {
-      type        = "Service"
-      identifiers = ["cloudtrail.amazonaws.com"]
-    }
-    actions   = ["s3:GetBucketAcl"]
-    resources = ["arn:aws:s3:::localshop-${var.environment}-cloudtrail-logs-${var.account_id}"]
-  }
-
-  statement {
-    sid = "AWSCloudTrailWrite"
-    principals {
-      type        = "Service"
-      identifiers = ["cloudtrail.amazonaws.com"]
-    }
-    actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::localshop-${var.environment}-cloudtrail-logs-${var.account_id}/AWSLogs/${var.account_id}/*"]
-    condition {
-      test     = "StringEquals"
-      variable = "s3:x-amz-acl"
-      values   = ["bucket-owner-full-control"]
-    }
-  }
+  project_name            = var.project_name
+  environment             = var.environment
+  account_id              = var.account_id
+  kms_key_arn             = var.kms_cloudtrail_key_arn
+  kms_logs_key_arn        = var.kms_cloudtrail_key_arn
+  s3_access_log_bucket_id = var.s3_access_log_bucket_id
 }
 
 # --- CloudTrail Configuration ---
@@ -174,7 +91,7 @@ resource "aws_sns_topic_policy" "cloudtrail" {
 
 resource "aws_cloudtrail" "main" {
   name                          = "localshop-${var.environment}-trail"
-  s3_bucket_name                = module.cloudtrail_bucket.s3_bucket_id
+  s3_bucket_name                = module.cloudtrail_bucket_native.s3_bucket_id
   include_global_service_events = true
   is_multi_region_trail         = true
   enable_log_file_validation    = true
