@@ -71,6 +71,7 @@ module "external_secrets_irsa" {
   name = "${var.project_name}-${var.environment}-external-secrets"
 
   attach_external_secrets_policy = true
+  attach_policy                  = false # Fixes "Invalid count argument" error
 
   oidc_providers = {
     ex = {
