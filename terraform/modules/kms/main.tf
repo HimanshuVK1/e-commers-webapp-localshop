@@ -1,7 +1,7 @@
 # --- Logs KMS Key ---
 
 module "kms_logs" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=c20bffd41ce9716140cb9938faf0aa147b38ca2a"
 
   description = "KMS key for S3 logs encryption"
   aliases     = ["localshop-${var.environment}-logs"]
@@ -18,7 +18,7 @@ module "kms_logs" {
 # --- CloudTrail KMS Key ---
 
 module "kms_cloudtrail" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=c20bffd41ce9716140cb9938faf0aa147b38ca2a"
 
   description = "KMS key for CloudTrail encryption"
   aliases     = ["localshop-${var.environment}-cloudtrail"]

@@ -1,5 +1,5 @@
 module "ecr" {
-  source   = "git::https://github.com/terraform-aws-modules/terraform-aws-ecr.git?ref=b6ef04d088cf91d5ba9505132e9ff7c9f847ed5d"
+  source   = "git::https://github.com/terraform-aws-modules/terraform-aws-ecr.git?ref=f475c99a68f1f3b0e0bf996d098d94c68570eab8"
   for_each = toset(var.services)
 
   repository_name = "${var.project_name}-${each.key}"

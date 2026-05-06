@@ -1,5 +1,5 @@
 module "eks" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=bef29c4d9523523e57fe898643fde2895106b339"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=85a1a1a0eccea95ffa3f7ac1c6047901a1f0a6cb"
 
   name               = "${var.project_name}-${var.environment}-cluster"
   kubernetes_version = "1.31"
@@ -14,10 +14,11 @@ module "eks" {
   # Support for AWS EKS MCP Server (Agentic DevOps)
   enable_cluster_creator_admin_permissions = true
   authentication_mode                      = "API_AND_CONFIG_MAP"
-  cluster_endpoint_public_access           = true
+  endpoint_public_access                   = true
 
   # MCP Server requires Control Plane logs for autonomous troubleshooting
-  cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+
 
   # Cost Optimized Spot instances
   eks_managed_node_groups = {
@@ -37,7 +38,7 @@ module "eks" {
 }
 
 module "external_secrets_irsa" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts-eks?ref=e803e25ce20a6ebd5579e0896f657fa739f6f03e"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts-eks?ref=c29ec1ed409683086f63f83ff5b10a6f3c296ef2"
 
   role_name = "${var.project_name}-${var.environment}-external-secrets"
 

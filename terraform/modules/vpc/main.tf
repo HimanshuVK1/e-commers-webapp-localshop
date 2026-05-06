@@ -23,7 +23,7 @@ locals {
 }
 
 module "vpc" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git?ref=3ffbd46fb1c7733e1b34d8666893280454e27436"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git?ref=7c1f791efd61f326ed6102d564d1a65d1eceedf0"
 
   name = "localshop-${var.environment}-vpc"
   cidr = "10.0.0.0/16"

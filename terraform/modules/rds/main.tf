@@ -11,7 +11,7 @@ resource "aws_security_group" "rds" {
 }
 
 module "db" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-rds.git?ref=bc8c1e240a98fd54a12c61c70de91cbabec71863"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-rds.git?ref=a76a3cd92220b91eaa467a5328db6f2c21e1fdee"
 
   identifier = "${var.project_name}-${var.environment}-db"
 
