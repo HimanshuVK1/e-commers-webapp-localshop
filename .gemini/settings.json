@@ -1,27 +1,46 @@
 {
   "mcpServers": {
     "github": {
-      "command": "npx",
+      "command": "docker",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-github"
+        "run",
+        "-i",
+        "--rm",
+        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "-e", "GITHUB_TOOLSETS",
+        "ghcr.io/github/github-mcp-server"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "$GITHUB_PERSONAL_ACCESS_TOKEN"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "$GITHUB_PERSONAL_ACCESS_TOKEN",
+        "GITHUB_TOOLSETS": "repos,issues,pull_requests,actions,users,context"
       }
     },
     "aws": {
-      "command": "npx",
+      "command": "docker",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-aws-resources"
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "C:/Users/Himanshu Vishwakarma/.aws:/root/.aws:ro",
+        "-e",
+        "AWS_PROFILE=default",
+        "-e",
+        "AWS_REGION=ap-south-1",
+        "public.ecr.aws/awslabs-mcp/awslabs/aws-api-mcp-server:latest"
       ]
     },
     "terraform": {
-      "command": "npx",
+      "command": "docker",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-terraform"
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "C:/Users/Himanshu Vishwakarma/Desktop/ai-agents/e-commers-webapp:/work",
+        "-w",
+        "/work",
+        "hashicorp/terraform-mcp-server:latest"
       ]
     },
     "eks": {
