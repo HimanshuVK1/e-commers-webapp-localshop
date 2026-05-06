@@ -15,6 +15,7 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
   authentication_mode                      = "API_AND_CONFIG_MAP"
   endpoint_public_access                   = true
+  cluster_endpoint_private_access          = true # Allow nodes to reach API server within VPC
 
   # MCP Server requires Control Plane logs for autonomous troubleshooting
   enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
@@ -28,12 +29,17 @@ module "eks" {
       min_size       = 1
       max_size       = 3
       desired_size   = 2
+
       # Explicitly provide the node role ARN created in the IAM module
       node_role_arn = var.eks_node_group_role_arn
-      # Prevent EKS module from creating its own instance profile
-      create_launch_template = false
-      launch_template_name   = null
-      instance_profile_name  = null
+
+      # Letting the module manage the launch template ensures correct security group attachments
+      create_launch_template = true
+      
+      # Ensure nodes have necessary tags for discovery
+      tags = {
+        "kubernetes.io/cluster/${var.project_name}-${var.environment}-cluster" = "owned"
+      }
     }
   }
 
@@ -44,12 +50,17 @@ module "eks" {
 
   access_entries = {
     console_user = {
-      principal_arn     = "arn:aws:iam::970547369309:user/himanshu1vadmin" # Your ARN from the screenshot
-      kubernetes_groups = ["system:masters"] # Grant admin-like permissions
+      principal_arn     = "arn:aws:iam::970547369309:user/himanshu1vadmin"
+      kubernetes_groups = ["system:masters"]
     }
     github_actions_role = {
       principal_arn     = "arn:aws:iam::970547369309:role/localshop-dev-github-actions-role"
-      kubernetes_groups = ["system:bootstrappers", "system:nodes"] # For nodes to join
+      kubernetes_groups = ["system:masters"] # Use system:masters for deployment role
+    }
+    # Nodes need to be authorized in Access Entries when using API_AND_CONFIG_MAP or API modes
+    node_role = {
+      principal_arn = var.eks_node_group_role_arn
+      type          = "EC2_LINUX"
     }
   }
 

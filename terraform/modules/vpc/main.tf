@@ -226,9 +226,11 @@ data "aws_iam_policy_document" "s3_endpoint_policy" {
   statement {
     sid       = "AllowEKSBootstrap"
     effect    = "Allow"
-    actions   = ["s3:GetObject"]
+    actions   = ["s3:GetObject", "s3:GetBucketLocation", "s3:ListBucket"]
     resources = [
+      "arn:aws:s3:::amazon-eks-*",
       "arn:aws:s3:::amazon-eks-*/*",
+      "arn:aws:s3:::eks-*",
       "arn:aws:s3:::eks-*/*"
     ]
     principals {
