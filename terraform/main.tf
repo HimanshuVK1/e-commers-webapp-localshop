@@ -84,7 +84,6 @@ module "rds" {
   environment      = var.environment
   vpc_id           = module.vpc.vpc_id
   database_subnets = module.vpc.database_subnets
-  db_password      = var.db_password
 }
 
 # --- EKS Authentication & Helm Provider ---
