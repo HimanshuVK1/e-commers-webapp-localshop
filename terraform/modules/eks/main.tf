@@ -14,8 +14,8 @@ module "eks" {
   # Support for AWS EKS MCP Server (Agentic DevOps)
   enable_cluster_creator_admin_permissions = true
   authentication_mode                      = "API_AND_CONFIG_MAP"
-  cluster_endpoint_public_access           = true 
-  
+  cluster_endpoint_public_access           = true
+
   # MCP Server requires Control Plane logs for autonomous troubleshooting
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
@@ -37,8 +37,7 @@ module "eks" {
 }
 
 module "external_secrets_irsa" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts-eks?ref=e803e25ce20a6ebd5579e0896f657fa739f6f03e"
 
   role_name = "${var.project_name}-${var.environment}-external-secrets"
 
