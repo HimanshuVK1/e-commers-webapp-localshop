@@ -15,7 +15,6 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
   authentication_mode                      = "API_AND_CONFIG_MAP"
   endpoint_public_access                   = true
-  cluster_endpoint_private_access          = true # Allow nodes to reach API server within VPC
 
   # MCP Server requires Control Plane logs for autonomous troubleshooting
   enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
