@@ -2,15 +2,9 @@ name: Build and Push Microservices
 
 on:
   push:
-    branches:
-      - dev
-    paths:
-      - 'webapp/**'
+    branches: [ dev ]
   pull_request:
-    branches:
-      - dev
-    paths:
-      - 'webapp/**'
+    branches: [ dev ]
 
 permissions:
   id-token: write
@@ -21,42 +15,47 @@ env:
   ECR_REGISTRY: '970547369309.dkr.ecr.ap-south-1.amazonaws.com'
 
 jobs:
-  build:
-    name: Build ${{ matrix.service }}
+  build-test:
+    name: Build & Test
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         service: [gateway, frontend, user-service, product-service, cart-service, order-service, inventory-service, analytics-service, payment-service, notification-service]
-    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
         with:
-          role-to-assume: arn:aws:iam::970547369309:role/localshop-dev-github-actions-role
-          aws-region: ${{ env.AWS_REGION }}
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ matrix.service }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ matrix.service }}-
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build
+      - name: Build Image
         run: |
-          cd webapp/${{ matrix.service }} || cd webapp/services/${{ matrix.service }} || exit 1
-          REPOSITORY=${{ env.ECR_REGISTRY }}/localshop-${{ matrix.service }}
-          docker build -t $REPOSITORY:${{ github.sha }} .
-        
+          cd webapp/${{ matrix.service }} || cd webapp/services/${{ matrix.service }}
+          docker buildx build --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max -t localshop-${{ matrix.service }}:${{ github.sha }} .
+
+      - name: Upload Artifact (Placeholder for Test Results)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.service }}-build-logs
+          path: .
+
   push:
-    name: Push ${{ matrix.service }}
-    needs: build
+    name: Push to ECR
+    needs: build-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
     strategy:
       matrix:
         service: [gateway, frontend, user-service, product-service, cart-service, order-service, inventory-service, analytics-service, payment-service, notification-service]
-    
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -67,7 +66,8 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Push
+      - name: Tag and Push
         run: |
           REPOSITORY=${{ env.ECR_REGISTRY }}/localshop-${{ matrix.service }}
+          docker tag localshop-${{ matrix.service }}:${{ github.sha }} $REPOSITORY:${{ github.sha }}
           docker push $REPOSITORY:${{ github.sha }}
