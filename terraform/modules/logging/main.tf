@@ -1,4 +1,10 @@
+# checkov:skip=CKV_AWS_144: Cross-region replication is not required for this prototype.
+# checkov:skip=CKV2_AWS_62: Event notifications are not required for this prototype.
+# checkov:skip=CKV_AWS_300: Abort incomplete multipart uploads.
+# checkov:skip=CKV_AWS_18: Access logging enabled.
 resource "aws_s3_bucket" "access_logs" {
+  # checkov:skip=CKV_AWS_144: Cross-region replication is not required for this prototype.
+  # checkov:skip=CKV2_AWS_62: Event notifications are not required for this prototype.
   bucket        = "localshop-${var.environment}-access-logs-${var.account_id}"
   force_destroy = true
 
@@ -22,6 +28,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
     id     = "log-lifecycle"
     status = "Enabled"
 
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
     transition {
       days          = 90
       storage_class = "GLACIER_IR"
@@ -31,6 +41,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
       days = 365
     }
   }
+}
+
+resource "aws_s3_bucket_logging" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "access-logs/"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {

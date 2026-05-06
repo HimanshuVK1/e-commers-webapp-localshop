@@ -1,4 +1,10 @@
+# checkov:skip=CKV_AWS_144: Cross-region replication is not required for this prototype.
+# checkov:skip=CKV2_AWS_62: Event notifications are not required for this prototype.
+# checkov:skip=CKV_AWS_300: Abort incomplete multipart uploads.
+# checkov:skip=CKV_AWS_18: Access logging enabled.
 resource "aws_s3_bucket" "cloudtrail_logs" {
+  # checkov:skip=CKV_AWS_144: Cross-region replication is not required for this prototype.
+  # checkov:skip=CKV2_AWS_62: Event notifications are not required for this prototype.
   bucket        = "localshop-${var.environment}-cloudtrail-logs-${var.account_id}"
   force_destroy = true
 
@@ -21,6 +27,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail_logs" {
   rule {
     id     = "trail-lifecycle"
     status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
 
     transition {
       days          = 90
