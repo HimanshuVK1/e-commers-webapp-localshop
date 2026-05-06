@@ -1,7 +1,7 @@
 # --- CloudTrail S3 Bucket ---
 
 module "cloudtrail_bucket" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=f90d8a385e4c70afd048e8997dcccf125b362236"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5"
 
   bucket        = "localshop-${var.environment}-cloudtrail-logs-${var.account_id}"
   force_destroy = true
@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "cloudtrail_logs_policy" {
 
 resource "aws_cloudwatch_log_group" "cloudtrail" {
   name              = "/aws/cloudtrail/localshop-${var.environment}-trail"
-  retention_in_days = 30 # Cost Optimized: 30 days retention as logs are archived to S3
+  retention_in_days = 365 # Ensure retention is at least 365 days
   kms_key_id        = var.kms_logs_key_arn
 
   tags = {

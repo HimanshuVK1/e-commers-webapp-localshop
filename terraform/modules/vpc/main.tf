@@ -23,7 +23,7 @@ locals {
 }
 
 module "vpc" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git?ref=7c1f791efd61f326ed6102d564d1a65d1eceedf0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git?ref=3ffbd46fb1c7733e1b34d8666893280454e27436"
 
   name = "localshop-${var.environment}-vpc"
   cidr = "10.0.0.0/16"
@@ -77,6 +77,7 @@ module "vpc" {
 }
 
 resource "aws_s3_bucket" "vpc_flow_logs" {
+  # checkov:skip=CKV_AWS_144: Cross-region replication is not required for VPC flow logs in this prototype.
   bucket        = "localshop-${var.environment}-vpc-flow-logs-${data.aws_caller_identity.current.account_id}"
   force_destroy = true
 
