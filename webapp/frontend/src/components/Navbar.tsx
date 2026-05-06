@@ -13,10 +13,10 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { User, Package, LogOut, ShoppingBag, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function Navbar() {
+function NavbarContent() {
   const { user, logout } = useUserStore();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -118,5 +118,13 @@ export default function Navbar() {
         </div>
       </div>
     </header>
+  );
+}
+
+export default function Navbar() {
+  return (
+    <Suspense fallback={null}>
+      <NavbarContent />
+    </Suspense>
   );
 }

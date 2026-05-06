@@ -22,11 +22,4 @@ variable "github_repo" {
   default     = "HimanshuVK1/e-commers-webapp-localshop"
 }
 
-variable "db_password" {
-  description = "Password for the RDS master user"
-  type        = string
-  sensitive   = true
-  default     = "SuperSecret123!" # Override via TF_VAR_db_password
-}
-
 

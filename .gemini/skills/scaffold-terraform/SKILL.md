@@ -15,10 +15,11 @@ description: Advanced AWS infrastructure management using modular Terraform. Use
 
 
 1.  **Modularity:** Always create resources within `terraform/modules/<service-name>/`.
-2.  **Verified Modules:** Exclusively use community modules from **`terraform-aws-modules/*`**.
-3.  **File Consistency:** Every module MUST have exactly `main.tf`, `variables.tf`, and `outputs.tf`.
-4.  **Connectivity:** Connect modules only via variables and outputs.
-5.  **Versioning:** Fix all provider and module versions to specific releases.
+2.  **Verified Modules:** Exclusively use community modules from **`terraform-aws-modules/*`** for major infrastructure components (e.g., EKS, VPC, RDS).
+3.  **Native Resource Preference:** If a community module consistently triggers deprecation warnings, maintenance overhead, or violates security standards, you MUST refactor to native Terraform resources to ensure long-term stability.
+4.  **File Consistency:** Every module MUST have exactly `main.tf`, `variables.tf`, and `outputs.tf`.
+5.  **Connectivity:** Connect modules only via variables and outputs.
+6.  **Versioning:** Fix all provider and module versions to specific releases (commit hashes).
 
 ## Tooling & Discovery
 
@@ -44,16 +45,19 @@ You MUST execute the following phases in sequence. Do not skip steps.
 6.  **Backend Check:** If this is a new root environment, check for `backend.tf`. Use **Native S3 Locking** (`use_lockfile = true`) for the state.
 
 ### Phase 2: Scaffolding (The 'Act' step)
-1.  Create `terraform/modules/<service-name>/`.
-2.  Copy all files from `assets/module-template/` to the new directory.
-3.  **Root Setup:** If configuring a new environment, copy `assets/backend.tf.tmpl` to the root `terraform/` directory.
-4.  **Run `node scripts/update_module_versions.cjs terraform-aws-modules/<service-name>/aws` to find the latest version.**
-5.  Populate `main.tf` using the official `terraform-aws-modules` source and the **VERSION_RESULT** from the script.
+1.  **DELEGATION MANDATE:** You MUST delegate the actual code generation to the `tf-writer` sub-agent.
+2.  Use the `invoke_agent` tool. Set `agent_name` to `tf-writer`.
+3.  In your prompt to `tf-writer`, provide:
+    - The target service name.
+    - The exact module version obtained from the script.
+    - The required variables and outputs based on the architecture specs.
+    - Explicit instruction to create the `main.tf`, `variables.tf`, and `outputs.tf` files in `terraform/modules/<service-name>/`.
+4.  **Root Setup:** If configuring a new environment, manually copy `assets/backend.tf.tmpl` to the root `terraform/` directory.
 
 ### Phase 3: Dependency Linking (The 'Integration' step)
-1.  Declare required inputs in the new module's `variables.tf`.
+1.  After `tf-writer` completes, verify the new module's `variables.tf`.
 2.  Map those variables to outputs from existing modules in the root `main.tf`.
-3.  Export unique identifiers (ID/ARN) in the new module's `outputs.tf`.
+3.  Ensure the new module exports required identifiers (ID/ARN) in its `outputs.tf`.
 
 ### Phase 4: Validation (The 'Sign-off' step)
 1.  Run `terraform fmt` on the new module.

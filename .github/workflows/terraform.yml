@@ -13,17 +13,17 @@ on:
       - 'terraform/**'
 
 permissions:
-  id-token: write # Required for OIDC
-  contents: read  # Required for checkout
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: 'ap-south-1'
+  TF_WORKING_DIR: 'terraform'
 
 jobs:
-  terraform:
-    name: 'Terraform'
+  validate:
+    name: 'Validate'
     runs-on: ubuntu-latest
-    env:
-      AWS_REGION: 'ap-south-1'
-      TF_WORKING_DIR: 'terraform'
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,13 +47,76 @@ jobs:
         run: terraform fmt -check
         working-directory: ${{ env.TF_WORKING_DIR }}
 
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  security-scan:
+    name: 'Security Scan'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ${{ env.TF_WORKING_DIR }}
+          quiet: true
+          framework: terraform
+
+  plan:
+    name: 'Plan'
+    needs: [validate, security-scan]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::970547369309:role/localshop-dev-github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.1
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
       - name: Terraform Plan
-        id: plan
-        if: github.event_name == 'pull_request'
-        run: terraform plan -no-color -input=false
+        run: terraform plan -input=false
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  apply:
+    name: 'Apply'
+    needs: [validate, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::970547369309:role/localshop-dev-github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.1
+
+      - name: Terraform Init
+        run: terraform init
         working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
         working-directory: ${{ env.TF_WORKING_DIR }}

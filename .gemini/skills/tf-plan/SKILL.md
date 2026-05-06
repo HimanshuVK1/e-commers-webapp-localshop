@@ -1,6 +1,6 @@
 ---
 name: tf-plan
-description: Run terraform plan and analyze the output for risks, warnings, and deprecations. Use before applying any infrastructure changes.
+description: Run terraform init --upgrade then terraform plan and analyze the output for risks, warnings, and deprecations and fix them. Use before applying any infrastructure changes.
 allowed-tools: run_shell_command, read_file, grep_search
 disable-model-invocation: true
 ---

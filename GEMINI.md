@@ -5,6 +5,8 @@
 - Use plain language; avoid jargon.
 - Explain **WHY**, not just what.
 - Proceed with the action only after providing this context.
+- **STRICT MCP MANDATE:** You MUST exclusively use the provided Model Context Protocol (MCP) tools for interacting with external systems, APIs, or infrastructure state whenever an applicable tool is available. **NEVER** bypass the MCP servers by falling back to raw shell commands (e.g., using `curl`, raw CLIs, or local CLI executions) for these tasks. If an MCP tool fails, you must troubleshoot the tool's parameters or syntax rather than abandoning it for a shell workaround.
+- **NATIVE RESOURCE MANDATE:** While we prioritize verified community modules for standard infrastructure (e.g., EKS, VPC), you MUST refactor to native Terraform resources if a community module consistently triggers deprecation warnings, maintenance overhead, or violates security standards. Prefer simple, direct resource definitions over complex, opaque community abstractions when high control or long-term stability is needed.
 
 ## 2. Project Overview
 **LocalShop** is a production-grade e-commerce microservices application. It is architected for cloud-native deployment on **AWS** using **Terraform** for infrastructure and **GitOps (ArgoCD)** for continuous delivery.
@@ -65,7 +67,7 @@ Every push to the `dev` branch triggers a multi-stage pipeline. For full archite
 - **Terraform Plan:** `cd terraform && terraform plan`
 
 ## 5. Custom Skills
-This project utilizes interoperable AI agent skills located in the **`.agents/skills/`** directory.
+This project utilizes interoperable AI agent skills located in the **`.gemini/skills/`** directory.
 
 ### scaffold-terraform
 - **Purpose:** Automates modular AWS infrastructure creation following `references/` specifications.
@@ -75,7 +77,17 @@ This project utilizes interoperable AI agent skills located in the **`.agents/sk
 - **Purpose:** Advanced plan analysis for risks, warnings, and deprecations.
 - **Workflow:** **STOP-AND-ASK.**
 
-## 6. Architectural Principles
+## 6. CI/CD Workflow Standards
+To ensure professional, scalable, and maintainable pipelines, all GitHub Actions workflows MUST follow these standards:
+
+- **Modularity:** Split workflows into distinct, logical jobs (e.g., `validate`, `plan`, `build`, `test`, `push`, `apply`). Use the `needs` keyword to define dependencies between stages.
+- **Caching:** ALWAYS implement caching for dependencies (e.g., `npm`, `docker` layers) to minimize execution time and resource cost.
+- **Fail-Fast & Parallelism:** When building multiple services, utilize `strategy: matrix` to run jobs in parallel, and disable `fail-fast` only when specific scenarios require it.
+- **Security:** Use OIDC (`id-token: write`) for AWS authentication instead of static credentials.
+- **Artifact Persistence:** Use `actions/upload-artifact` to persist logs, test reports, or build results across jobs for enhanced debugging.
+- **Formatting & Validation:** Every CI pipeline must include strict formatting (`fmt -check`) and validation (`validate`) steps before any planning or deployment occurs.
+
+## 7. Architectural Principles
 - **Clean Separation:** Application source lives in `webapp/`; Infrastructure in `terraform/`.
 - **Event-Driven:** Async communication via RabbitMQ Fanout Exchange.
 - **Statelessness:** All persistent data resides in infrastructure containers.

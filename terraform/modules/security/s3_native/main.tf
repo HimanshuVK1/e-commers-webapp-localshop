@@ -2,10 +2,10 @@
 # checkov:skip=CKV2_AWS_62: Event notifications are not required for this prototype.
 # checkov:skip=CKV_AWS_300: Abort incomplete multipart uploads.
 # checkov:skip=CKV_AWS_18: Access logging enabled.
-resource "aws_s3_bucket" "access_logs" {
+resource "aws_s3_bucket" "cloudtrail_logs" {
   # checkov:skip=CKV_AWS_144: Cross-region replication is not required for this prototype.
   # checkov:skip=CKV2_AWS_62: Event notifications are not required for this prototype.
-  bucket        = "localshop-${var.environment}-access-logs-${var.account_id}"
+  bucket        = "localshop-${var.environment}-cloudtrail-logs-${var.account_id}"
   force_destroy = true
 
   tags = {
@@ -14,18 +14,18 @@ resource "aws_s3_bucket" "access_logs" {
   }
 }
 
-resource "aws_s3_bucket_versioning" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
+resource "aws_s3_bucket_versioning" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
+resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
 
   rule {
-    id     = "log-lifecycle"
+    id     = "trail-lifecycle"
     status = "Enabled"
 
     abort_incomplete_multipart_upload {
@@ -43,26 +43,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
   }
 }
 
-resource "aws_s3_bucket_logging" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-
-  target_bucket = aws_s3_bucket.access_logs.id
-  target_prefix = "access-logs/"
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
+resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = var.kms_key_arn
+      kms_master_key_id = var.kms_logs_key_arn
       sse_algorithm     = "aws:kms"
     }
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
+resource "aws_s3_bucket_public_access_block" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -70,22 +63,31 @@ resource "aws_s3_bucket_public_access_block" "access_logs" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_policy" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
+resource "aws_s3_bucket_policy" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowLogDelivery"
+        Sid    = "AWSCloudTrailAclCheck"
         Effect = "Allow"
         Principal = {
-          Service = "delivery.logs.amazonaws.com"
+          Service = "cloudtrail.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.cloudtrail_logs.arn
+      },
+      {
+        Sid    = "AWSCloudTrailWrite"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
         }
         Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.access_logs.arn}/*"
+        Resource = "${aws_s3_bucket.cloudtrail_logs.arn}/AWSLogs/${var.account_id}/*"
         Condition = {
           StringEquals = {
-            "aws:SourceAccount" = var.account_id
+            "s3:x-amz-acl" = "bucket-owner-full-control"
           }
         }
       },
@@ -97,8 +99,8 @@ resource "aws_s3_bucket_policy" "access_logs" {
         }
         Action   = "s3:*"
         Resource = [
-          aws_s3_bucket.access_logs.arn,
-          "${aws_s3_bucket.access_logs.arn}/*"
+          aws_s3_bucket.cloudtrail_logs.arn,
+          "${aws_s3_bucket.cloudtrail_logs.arn}/*"
         ]
         Condition = {
           Bool = {
@@ -110,6 +112,13 @@ resource "aws_s3_bucket_policy" "access_logs" {
   })
 }
 
-output "bucket_id" {
-  value = aws_s3_bucket.access_logs.id
+resource "aws_s3_bucket_logging" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
+
+  target_bucket = var.s3_access_log_bucket_id
+  target_prefix = "cloudtrail-logs/"
+}
+
+output "s3_bucket_id" {
+  value = aws_s3_bucket.cloudtrail_logs.id
 }

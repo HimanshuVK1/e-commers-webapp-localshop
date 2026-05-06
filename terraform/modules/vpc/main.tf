@@ -77,6 +77,7 @@ module "vpc" {
 }
 
 resource "aws_s3_bucket" "vpc_flow_logs" {
+  # checkov:skip=CKV_AWS_144: Cross-region replication is not required for VPC flow logs in this prototype.
   bucket        = "localshop-${var.environment}-vpc-flow-logs-${data.aws_caller_identity.current.account_id}"
   force_destroy = true
 

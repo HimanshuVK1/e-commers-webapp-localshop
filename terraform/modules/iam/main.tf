@@ -41,6 +41,7 @@ resource "aws_iam_role" "github_actions" {
 # --- IAM Policy for GitHub Actions (Admin for Migration) ---
 
 resource "aws_iam_role_policy_attachment" "admin_access" {
+  # checkov:skip=CKV_AWS_274: Admin access is required for Terraform CI/CD to provision resources.
   role       = aws_iam_role.github_actions.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
