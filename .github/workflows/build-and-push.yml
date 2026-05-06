@@ -12,21 +12,23 @@ on:
     paths:
       - 'webapp/**'
 
-env:
-  AWS_REGION: 'ap-south-1'
-  ECR_REGISTRY: '970547369309.dkr.ecr.ap-south-1.amazonaws.com' # To be updated after ECR creation
-
 permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_REGION: 'ap-south-1'
+  ECR_REGISTRY: '970547369309.dkr.ecr.ap-south-1.amazonaws.com'
+
 jobs:
   build:
+    name: Build ${{ matrix.service }}
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false # Prevents one failing build from cancelling the other parallel builds
+      fail-fast: false
       matrix:
         service: [gateway, frontend, user-service, product-service, cart-service, order-service, inventory-service, analytics-service, payment-service, notification-service]
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,14 +40,34 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push
-        if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+      - name: Build
         run: |
           cd webapp/${{ matrix.service }} || cd webapp/services/${{ matrix.service }} || exit 1
-          IMAGE_TAG=${{ github.sha }}
           REPOSITORY=${{ env.ECR_REGISTRY }}/localshop-${{ matrix.service }}
-          docker build -t $REPOSITORY:$IMAGE_TAG .
-          docker push $REPOSITORY:$IMAGE_TAG
+          docker build -t $REPOSITORY:${{ github.sha }} .
+        
+  push:
+    name: Push ${{ matrix.service }}
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+    strategy:
+      matrix:
+        service: [gateway, frontend, user-service, product-service, cart-service, order-service, inventory-service, analytics-service, payment-service, notification-service]
+    
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::970547369309:role/localshop-dev-github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push
+        run: |
+          REPOSITORY=${{ env.ECR_REGISTRY }}/localshop-${{ matrix.service }}
+          docker push $REPOSITORY:${{ github.sha }}
