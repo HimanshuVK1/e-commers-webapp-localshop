@@ -35,6 +35,18 @@ module "eks" {
     Project     = var.project_name
     Environment = var.environment
   }
+
+  access_entries = {
+    console_user = {
+      principal_arn     = "arn:aws:iam::970547369309:user/himanshu1vadmin" # Your ARN from the screenshot
+      kubernetes_groups = ["system:masters"] # Grant admin-like permissions
+    }
+    github_actions_role = {
+      principal_arn     = "arn:aws:iam::970547369309:role/localshop-dev-github-actions-role"
+      kubernetes_groups = ["system:bootstrappers", "system:nodes"] # For nodes to join
+    }
+  }
+
 }
 
 module "external_secrets_irsa" {
