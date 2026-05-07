@@ -97,7 +97,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_logs" {
         Principal = {
           AWS = "*"
         }
-        Action   = "s3:*"
+        Action = "s3:*"
         Resource = [
           aws_s3_bucket.cloudtrail_logs.arn,
           "${aws_s3_bucket.cloudtrail_logs.arn}/*"

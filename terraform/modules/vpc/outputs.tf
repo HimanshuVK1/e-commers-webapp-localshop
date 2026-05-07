@@ -1,29 +1,39 @@
 output "vpc_id" {
-  description = "The ID of the VPC"
+  description = "The ID of the VPC."
   value       = module.vpc.vpc_id
 }
 
 output "vpc_cidr_block" {
-  description = "The CIDR block of the VPC"
+  description = "The CIDR block of the VPC."
   value       = module.vpc.vpc_cidr_block
 }
 
 output "private_subnets" {
-  description = "List of IDs of private subnets"
+  description = "List of IDs of private subnets."
   value       = module.vpc.private_subnets
 }
 
 output "public_subnets" {
-  description = "List of IDs of public subnets"
+  description = "List of IDs of public subnets."
   value       = module.vpc.public_subnets
 }
 
 output "database_subnets" {
-  description = "List of IDs of database subnets"
+  description = "List of IDs of database subnets."
   value       = module.vpc.database_subnets
 }
 
-output "vpc_flow_logs_bucket_id" {
-  description = "The ID of the S3 bucket for VPC flow logs"
-  value       = aws_s3_bucket.vpc_flow_logs.id
+output "database_subnet_group_name" {
+  description = "ID of the database subnet group."
+  value       = module.vpc.database_subnet_group_name
+}
+
+output "nat_public_ips" {
+  description = "List of public Elastic IPs created for NAT Gateway."
+  value       = module.vpc.nat_public_ips
+}
+
+output "vpc_endpoint_security_group_id" {
+  description = "The ID of the security group created for VPC endpoints."
+  value       = module.vpc_endpoints.security_group_id
 }

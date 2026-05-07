@@ -72,5 +72,9 @@ You MUST execute the following phases in sequence. Do not skip steps.
 2.  Review any FAILED checks.
 3.  If critical vulnerabilities are found, you MUST fix them using the **`security-auditor`** subagent before finishing the task.
 
+### phase 6: Check Proper Connectivity between Modules and Cloud Resources or Services (The 'Testing' step)
+1.  **MANDATORY:** You MUST run the `tf-plan` skill to validate the infrastructure changes before applying.
+2.  Analyze the plan output for any risks, warnings, or deprecations.
+
 ## References
 - Refer to `references/naming-conventions.md` for resource naming rules.

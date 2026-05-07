@@ -1,14 +1,19 @@
 variable "project_name" {
+  description = "Project name"
   type        = string
-  description = "Project name for resource tagging"
 }
 
 variable "environment" {
+  description = "Environment name"
   type        = string
-  description = "Environment name (dev/prod)"
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
 }
 
 variable "account_id" {
-  type        = string
   description = "AWS Account ID"
+  type        = string
 }
