@@ -110,5 +110,8 @@ module "argocd" {
 
   github_repo = var.github_repo
 
-  depends_on = [module.eks]
+  depends_on = [
+    module.eks,
+    module.eks.module.eks.aws_eks_access_entry.this["github_actions_role"],
+  ]
 }
