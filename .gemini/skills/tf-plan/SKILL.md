@@ -29,6 +29,11 @@ You MUST summarize the following after execution:
 ### 4. Blast Radius
 - Estimate the scope of impact (e.g., "Network wide," "Service specific," "Security/IAM only").
 
+### phase 5: Check Proper Connectivity between Modules and Cloud Resources or Services (The 'Testing' step)
+1.  **MANDATORY:** You MUST run the `tf-plan` skill to validate the infrastructure changes before applying.
+2.  Analyze the plan output for any risks, warnings, or deprecations.
+
+
 ## Post-Check Suggestions
 Provide actionable suggestions based on the findings:
 - How to resolve warnings or deprecations (e.g., suggest using `moved` blocks for renames).
@@ -40,3 +45,4 @@ If the plan fails:
 - Read the error log.
 - Diagnose the root cause (e.g., missing variables, provider auth, syntax, version mismatch).
 - Suggest a specific fix aligned with project standards in `AGENTS.md`.
+

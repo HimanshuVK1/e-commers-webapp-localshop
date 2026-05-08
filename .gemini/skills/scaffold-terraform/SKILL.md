@@ -20,6 +20,7 @@ description: Advanced AWS infrastructure management using modular Terraform. Use
 4.  **File Consistency:** Every module MUST have exactly `main.tf`, `variables.tf`, and `outputs.tf`.
 5.  **Connectivity:** Connect modules only via variables and outputs.
 6.  **Versioning:** Fix all provider and module versions to specific releases (commit hashes).
+7.  **VPC Endpoints & Service Bootstrapping:** When implementing custom VPC Endpoint policies (e.g., S3 Gateway), you MUST explicitly whitelist the hidden, service-owned buckets or endpoints required for resource bootstrapping (e.g., `amazon-eks-*` for EKS nodes, or specific regional buckets for other AWS services). Overtightening endpoint policies causes silent communication failures, resulting in infinite "Still creating..." timeout loops during infrastructure provisioning.
 
 ## Tooling & Discovery
 
@@ -70,6 +71,10 @@ You MUST execute the following phases in sequence. Do not skip steps.
 1.  **MANDATORY:** You MUST activate and run the **`terraform-config-infra-scanner`** skill on the `terraform/` directory.
 2.  Review any FAILED checks.
 3.  If critical vulnerabilities are found, you MUST fix them using the **`security-auditor`** subagent before finishing the task.
+
+### phase 6: Check Proper Connectivity between Modules and Cloud Resources or Services (The 'Testing' step)
+1.  **MANDATORY:** You MUST run the `tf-plan` skill to validate the infrastructure changes before applying.
+2.  Analyze the plan output for any risks, warnings, or deprecations.
 
 ## References
 - Refer to `references/naming-conventions.md` for resource naming rules.

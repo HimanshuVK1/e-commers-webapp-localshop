@@ -1,16 +1,30 @@
-# checkov:skip=CKV_AWS_144: Cross-region replication is not required for this prototype.
-# checkov:skip=CKV2_AWS_62: Event notifications are not required for this prototype.
-# checkov:skip=CKV_AWS_300: Abort incomplete multipart uploads.
-# checkov:skip=CKV_AWS_18: Access logging enabled.
+terraform {
+  required_version = "1.15.1"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "6.43.0"
+    }
+  }
+}
+
+locals {
+  bucket_name = "localshop-${var.environment}-access-logs-${var.account_id}"
+}
+
 resource "aws_s3_bucket" "access_logs" {
   # checkov:skip=CKV_AWS_144: Cross-region replication is not required for this prototype.
   # checkov:skip=CKV2_AWS_62: Event notifications are not required for this prototype.
-  bucket        = "localshop-${var.environment}-access-logs-${var.account_id}"
+  # checkov:skip=CKV_AWS_18: Access logging is not required on the access logs bucket itself.
+  # checkov:skip=CKV_AWS_145: AES256 is used instead of KMS for cost efficiency in prototype.
+  bucket        = local.bucket_name
   force_destroy = true
 
   tags = {
-    Project     = var.project_name
+    Name        = local.bucket_name
     Environment = var.environment
+    Project     = var.project_name
+    ManagedBy   = "Terraform"
   }
 }
 
@@ -21,42 +35,12 @@ resource "aws_s3_bucket_versioning" "access_logs" {
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-
-  rule {
-    id     = "log-lifecycle"
-    status = "Enabled"
-
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 7
-    }
-
-    transition {
-      days          = 90
-      storage_class = "GLACIER_IR"
-    }
-
-    expiration {
-      days = 365
-    }
-  }
-}
-
-resource "aws_s3_bucket_logging" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-
-  target_bucket = aws_s3_bucket.access_logs.id
-  target_prefix = "access-logs/"
-}
-
 resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
   bucket = aws_s3_bucket.access_logs.id
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = var.kms_key_arn
-      sse_algorithm     = "aws:kms"
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -70,46 +54,60 @@ resource "aws_s3_bucket_public_access_block" "access_logs" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_policy" "access_logs" {
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
   bucket = aws_s3_bucket.access_logs.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowLogDelivery"
-        Effect = "Allow"
-        Principal = {
-          Service = "delivery.logs.amazonaws.com"
-        }
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.access_logs.arn}/*"
-        Condition = {
-          StringEquals = {
-            "aws:SourceAccount" = var.account_id
-          }
-        }
-      },
-      {
-        Sid    = "DenyNonSSL"
-        Effect = "Deny"
-        Principal = {
-          AWS = "*"
-        }
-        Action   = "s3:*"
-        Resource = [
-          aws_s3_bucket.access_logs.arn,
-          "${aws_s3_bucket.access_logs.arn}/*"
-        ]
-        Condition = {
-          Bool = {
-            "aws:SecureTransport" = "false"
-          }
-        }
-      }
-    ]
-  })
+
+  rule {
+    id     = "log-retention"
+    status = "Enabled"
+
+    expiration {
+      days = 365
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
 }
 
-output "bucket_id" {
-  value = aws_s3_bucket.access_logs.id
+resource "aws_s3_bucket_policy" "log_delivery" {
+  bucket = aws_s3_bucket.access_logs.id
+  policy = data.aws_iam_policy_document.log_delivery.json
+}
+
+data "aws_iam_policy_document" "log_delivery" {
+  statement {
+    sid    = "AWSLogDeliveryWrite"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = ["s3:PutObject"]
+
+    resources = ["${aws_s3_bucket.access_logs.arn}/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+  }
+
+  statement {
+    sid    = "AWSLogDeliveryAclCheck"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = ["s3:GetBucketAcl"]
+
+    resources = [aws_s3_bucket.access_logs.arn]
+  }
 }

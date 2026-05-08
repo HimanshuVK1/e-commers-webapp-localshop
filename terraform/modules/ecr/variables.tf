@@ -1,14 +1,48 @@
 variable "project_name" {
-  type = string
+  description = "Name of the project used for resource naming"
+  type        = string
 }
+
 variable "environment" {
-  type = string
+  description = "Deployment environment (e.g. dev, staging, prod)"
+  type        = string
 }
+
 variable "services" {
-  type = list(string)
+  description = "List of services to create ECR repositories for"
+  type        = list(string)
   default = [
-    "gateway", "frontend", "user-service", "product-service",
-    "cart-service", "order-service", "inventory-service",
-    "analytics-service", "payment-service", "notification-service"
+    "gateway",
+    "frontend",
+    "user-service",
+    "product-service",
+    "cart-service",
+    "order-service",
+    "inventory-service",
+    "analytics-service",
+    "payment-service",
+    "notification-service"
   ]
+}
+
+variable "image_tag_mutability" {
+  description = "The tag mutability setting for the repository. Must be one of: MUTABLE or IMMUTABLE"
+  type        = string
+  default     = "IMMUTABLE"
+  validation {
+    condition     = contains(["MUTABLE", "IMMUTABLE"], var.image_tag_mutability)
+    error_message = "The image_tag_mutability must be either MUTABLE or IMMUTABLE."
+  }
+}
+
+variable "scan_on_push" {
+  description = "Indicates whether images are scanned after being pushed to the repository"
+  type        = bool
+  default     = true
+}
+
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
+  default     = {}
 }

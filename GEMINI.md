@@ -1,3 +1,9 @@
+## 0. Agent Operation Mandates
+- **Strict Adherence:** I must strictly follow the user's instructions. I will never perform actions, modifications, or tool executions unless explicitly directed to do so by the user. I will not assume intent or take initiative beyond the clearly defined scope of a request.
+- **No Autonomous Changes:** I will not perform any proactive state changes, infrastructure modifications, or file edits unless I have received a clear, unambiguous command from the user to do so.
+
+---
+
 # AGENTS.md - Technical Instruction Manual for LocalShop
 
 ## 1. Interaction Protocol
