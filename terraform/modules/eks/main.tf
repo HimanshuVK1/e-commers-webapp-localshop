@@ -114,6 +114,8 @@ addons = {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 # --- IRSA Role for External Secrets (Native Resource) ---
 
 resource "aws_iam_role" "external_secrets" {
