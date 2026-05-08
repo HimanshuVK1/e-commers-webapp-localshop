@@ -22,6 +22,10 @@ module "iam" {
   project_name = var.project_name
   environment  = var.environment
   github_repo  = var.github_repo
+  kms_key_arns = [
+    module.kms.logs_key_arn,
+    module.kms.cloudtrail_key_arn
+  ]
 }
 
 # 2. Logging Module (Storage)

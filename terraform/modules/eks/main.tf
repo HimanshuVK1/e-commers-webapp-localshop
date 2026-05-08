@@ -144,7 +144,34 @@ resource "aws_iam_role" "external_secrets" {
   }
 }
 
+resource "aws_iam_policy" "external_secrets" {
+  # checkov:skip=CKV_AWS_355: ListSecrets does not support resource-level permissions.
+  # checkov:skip=CKV_AWS_290: Read access is required for External Secrets operator.
+  name_prefix = "localshop-${var.environment}-external-secrets-"
+  description = "Allow External Secrets to read secrets from Secrets Manager"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds"
+        ]
+        Effect   = "Allow"
+        Resource = "arn:aws:secretsmanager:*:${data.aws_caller_identity.current.account_id}:secret:localshop-*"
+      },
+      {
+        Action   = "secretsmanager:ListSecrets"
+        Effect   = "Allow"
+        Resource = "*" # ListSecrets does not support resource-level permissions.
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "external_secrets_secrets_manager" {
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
   role       = aws_iam_role.external_secrets.name
+  policy_arn = aws_iam_policy.external_secrets.arn
 }

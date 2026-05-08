@@ -18,3 +18,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "kms_key_arns" {
+  description = "A list of KMS key ARNs that the EKS nodes need access to"
+  type        = list(string)
+  default     = []
+}

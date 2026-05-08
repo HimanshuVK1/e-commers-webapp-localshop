@@ -27,3 +27,8 @@ output "external_secrets_role_arn" {
   description = "The IAM role ARN for External Secrets IRSA"
   value       = aws_iam_role.external_secrets.arn
 }
+
+output "kms_key_arn" {
+  description = "The ARN of the KMS key used for cluster encryption"
+  value       = module.eks.kms_key_arn
+}

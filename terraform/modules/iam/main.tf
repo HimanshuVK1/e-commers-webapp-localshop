@@ -50,6 +50,7 @@ resource "aws_iam_role" "github_actions" {
 
 resource "aws_iam_role_policy_attachment" "github_actions_admin" {
   # checkov:skip=CKV_AWS_274: AdministratorAccess is required for IaC provisioning via GitHub Actions.
+  # checkov:skip=CKV_AWS_290: AdministratorAccess is inherently unconstrained but necessary for CI/CD.
   role       = aws_iam_role.github_actions.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
@@ -99,6 +100,8 @@ resource "aws_iam_role_policy_attachment" "ssm_core" {
 }
 
 resource "aws_iam_policy" "node_kms" {
+  # checkov:skip=CKV_AWS_290: Write access (Encrypt/GenerateDataKey) is required for nodes to handle encrypted data.
+  # checkov:skip=CKV_AWS_355: Wildcard is used within a scoped ARN pattern for regional KMS keys.
   name_prefix = "localshop-${var.environment}-node-kms-"
   description = "Allow EKS nodes to use KMS keys for encryption/decryption"
 
@@ -114,7 +117,7 @@ resource "aws_iam_policy" "node_kms" {
           "kms:DescribeKey"
         ]
         Effect   = "Allow"
-        Resource = "*" # Scoped to all keys; in production, this should be narrowed.
+        Resource = length(var.kms_key_arns) > 0 ? var.kms_key_arns : ["arn:aws:kms:*:*:key/*"]
       }
     ]
   })
