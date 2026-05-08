@@ -60,6 +60,7 @@ module "eks" {
   project_name            = var.project_name
   environment             = var.environment
   vpc_id                  = module.vpc.vpc_id
+  vpc_cidr                = module.vpc.vpc_cidr_block
   private_subnets         = module.vpc.private_subnets
   admin_user_arn          = "arn:aws:iam::${local.account_id}:user/himanshu1vadmin"
   node_role_arn           = module.iam.eks_node_group_role_arn

@@ -18,6 +18,25 @@ module "eks" {
   subnet_ids               = var.private_subnets
   control_plane_subnet_ids = var.private_subnets
 
+  # Networking: Enable Private Access for nodes in private subnets
+  endpoint_private_access = true
+  endpoint_public_access  = true
+
+  # EKS Add-ons (Essential for Node Readiness)
+addons = {
+    vpc-cni = {
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
+    }
+    coredns = {
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
+    }
+    kube-proxy = {
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
+    }
+  }
   # Authentication & RBAC (Modern Best Practice)
   authentication_mode                      = "API_AND_CONFIG_MAP"
   enable_cluster_creator_admin_permissions = true
@@ -31,19 +50,17 @@ module "eks" {
     resources = ["secrets"]
   }
 
-  /*
   # Cluster Security Group Rules
-  cluster_security_group_additional_rules = {
+  security_group_additional_rules = {
     vpc_https = {
       description = "Allow HTTPS from VPC"
       protocol    = "tcp"
       from_port   = 443
       to_port     = 443
       type        = "ingress"
-      cidr_blocks = ["10.0.0.0/16"]
+      cidr_blocks = [var.vpc_cidr]
     }
   }
-  */
 
   # Access Entries
   access_entries = {

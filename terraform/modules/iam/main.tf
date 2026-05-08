@@ -23,7 +23,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 # --- GitHub Actions CI/CD Role ---
 
 resource "aws_iam_role" "github_actions" {
-  name = "${var.project_name}-${var.environment}-github-actions-role"
+  name_prefix = "${var.project_name}-${var.environment}-gha-"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -73,8 +73,8 @@ resource "aws_iam_role" "eks_node_group" {
   })
 
   tags = merge(var.tags, {
-    Name                                          = "eks-node-group-role"
-    "kubernetes.io/cluster/localshop-dev-cluster" = "owned"
+    Name                                                                   = "eks-node-group-role"
+    "kubernetes.io/cluster/${var.project_name}-${var.environment}-cluster" = "owned"
   })
 }
 
@@ -91,6 +91,38 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
 resource "aws_iam_role_policy_attachment" "ecr_readonly" {
   role       = aws_iam_role.eks_node_group.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.eks_node_group.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_policy" "node_kms" {
+  name_prefix = "localshop-${var.environment}-node-kms-"
+  description = "Allow EKS nodes to use KMS keys for encryption/decryption"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Effect   = "Allow"
+        Resource = "*" # Scoped to all keys; in production, this should be narrowed.
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "node_kms" {
+  role       = aws_iam_role.eks_node_group.name
+  policy_arn = aws_iam_policy.node_kms.arn
 }
 
 # --- IAM Instance Profile for EKS Nodes ---

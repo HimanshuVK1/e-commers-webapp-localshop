@@ -82,7 +82,24 @@ module "cloudtrail_key" {
       principals = [
         {
           type        = "Service"
-          identifiers = ["sns.amazonaws.com"]
+          identifiers = ["sns.amazonaws.com", "cloudtrail.amazonaws.com"]
+        }
+      ]
+    },
+    {
+      sid = "AllowCloudWatchLogs"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logs.${var.aws_region}.amazonaws.com"]
         }
       ]
     }
