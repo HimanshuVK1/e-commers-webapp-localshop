@@ -71,33 +71,26 @@ module "eks" {
   access_entries = {
     console_user = {
       principal_arn = var.admin_user_arn
-      policy_associations = {
+      access_policies = {
         admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
           access_scope = {
             type = "cluster"
           }
-
         }
-
       }
-
     }
 
     github_actions_role = {
       principal_arn = var.github_actions_role_arn
-      type          = "EC2_LINUX"
-      policy_associations = {
+      access_policies = {
         admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
           access_scope = {
             type = "cluster"
           }
-
         }
-
       }
-
     }
 
   }
@@ -114,6 +107,7 @@ module "eks" {
 
       # Explicitly use the provided node role
       create_iam_role = false
+      iam_role_arn    = var.node_role_arn
     }
 
   }
