@@ -67,7 +67,6 @@ module "eks" {
   vpc_cidr                = module.vpc.vpc_cidr_block
   private_subnets         = module.vpc.private_subnets
   admin_user_arn          = "arn:aws:iam::${local.account_id}:user/himanshu1vadmin"
-  node_role_arn           = module.iam.eks_node_group_role_arn
   github_actions_role_arn = module.iam.github_actions_role_arn
 }
 

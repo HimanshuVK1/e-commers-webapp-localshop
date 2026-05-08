@@ -23,7 +23,7 @@ module "eks" {
   endpoint_public_access  = true
 
   # EKS Add-ons (Essential for Node Readiness)
-addons = {
+  addons = {
     vpc-cni = {
       resolve_conflicts_on_create = "OVERWRITE"
       resolve_conflicts_on_update = "OVERWRITE"
@@ -75,12 +75,9 @@ addons = {
         }
       }
     }
-    node_role = {
-      principal_arn = var.node_role_arn
-      type          = "EC2_LINUX"
-    }
     github_actions_role = {
       principal_arn = var.github_actions_role_arn
+      type          = "EC2_LINUX"
       policy_associations = {
         admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
@@ -165,9 +162,16 @@ resource "aws_iam_policy" "external_secrets" {
         Resource = "arn:aws:secretsmanager:*:${data.aws_caller_identity.current.account_id}:secret:localshop-*"
       },
       {
-        Action   = "secretsmanager:ListSecrets"
-        Effect   = "Allow"
+        Sid    = "AllowListSecrets"
+        Effect = "Allow"
+        Action = ["secretsmanager:ListSecrets"]
         Resource = "*" # ListSecrets does not support resource-level permissions.
+      },
+      {
+        Sid    = "AllowBatchGetSecretValue"
+        Effect = "Allow"
+        Action = ["secretsmanager:BatchGetSecretValue"]
+        Resource = "arn:aws:secretsmanager:*:${data.aws_caller_identity.current.account_id}:secret:localshop-*"
       }
     ]
   })
