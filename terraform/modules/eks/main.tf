@@ -5,6 +5,7 @@ terraform {
       source  = "hashicorp/aws"
       version = "6.43.0"
     }
+
   }
 }
 
@@ -28,14 +29,17 @@ module "eks" {
       resolve_conflicts_on_create = "OVERWRITE"
       resolve_conflicts_on_update = "OVERWRITE"
     }
+
     coredns = {
       resolve_conflicts_on_create = "OVERWRITE"
       resolve_conflicts_on_update = "OVERWRITE"
     }
+
     kube-proxy = {
       resolve_conflicts_on_create = "OVERWRITE"
       resolve_conflicts_on_update = "OVERWRITE"
     }
+
   }
   # Authentication & RBAC (Modern Best Practice)
   authentication_mode                      = "API_AND_CONFIG_MAP"
@@ -60,6 +64,7 @@ module "eks" {
       type        = "ingress"
       cidr_blocks = [var.vpc_cidr]
     }
+
   }
 
   # Access Entries
@@ -72,9 +77,13 @@ module "eks" {
           access_scope = {
             type = "cluster"
           }
+
         }
+
       }
+
     }
+
     github_actions_role = {
       principal_arn = var.github_actions_role_arn
       type          = "EC2_LINUX"
@@ -84,9 +93,13 @@ module "eks" {
           access_scope = {
             type = "cluster"
           }
+
         }
+
       }
+
     }
+
   }
 
   eks_managed_node_groups = {
@@ -101,8 +114,8 @@ module "eks" {
 
       # Explicitly use the provided node role
       create_iam_role = false
-      iam_role_arn    = var.node_role_arn
     }
+
   }
 
   tags = {
@@ -126,13 +139,17 @@ resource "aws_iam_role" "external_secrets" {
         Principal = {
           Federated = module.eks.oidc_provider_arn
         }
+
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
             "${module.eks.oidc_provider}:sub" = "system:serviceaccount:external-secrets:external-secrets"
           }
+
         }
-      },
+
+      }
+,
     ]
   })
 
@@ -160,19 +177,22 @@ resource "aws_iam_policy" "external_secrets" {
         ]
         Effect   = "Allow"
         Resource = "arn:aws:secretsmanager:*:${data.aws_caller_identity.current.account_id}:secret:localshop-*"
-      },
+      }
+,
       {
         Sid    = "AllowListSecrets"
         Effect = "Allow"
         Action = ["secretsmanager:ListSecrets"]
         Resource = "*" # ListSecrets does not support resource-level permissions.
-      },
+      }
+,
       {
         Sid    = "AllowBatchGetSecretValue"
         Effect = "Allow"
         Action = ["secretsmanager:BatchGetSecretValue"]
         Resource = "arn:aws:secretsmanager:*:${data.aws_caller_identity.current.account_id}:secret:localshop-*"
       }
+
     ]
   })
 }
