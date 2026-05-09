@@ -1,3 +1,25 @@
+# 🚀 LocalShop Internal Developer Platform (IDP)
+
+**This is not just an e-commerce application.**  
+It is a **production-grade Internal Developer Platform** with AI-augmented operations.
+
+> **Goal**: Enable developers to ship microservices to AWS EKS in minutes with security, observability, and compliance built-in — using golden paths and self-service tooling.
+
+---
+
+## 🎯 Platform Engineering Highlights
+
+- **Reusable Infrastructure Modules** (Terraform)
+- **GitOps Self-Service Delivery** (ArgoCD + Helm)
+- **Secure Secrets Abstraction** (External Secrets Operator + AWS Secrets Manager)
+- **Policy-as-Code & Compliance** (Checkov + planned Kyverno)
+- **AI Agent Layer** (Gemini CLI + EKS MCP + **GitHub MCP**)
+- **Golden Paths** for common developer workflows
+
+**New to this branch (`feature/idp-enhancements`)**: Comprehensive IDP documentation + Golden Paths
+
+---
+
 # LocalShop E-Commerce System
 
 <img src="webapp/frontend/public/logo.svg" width="120" alt="LocalShop Logo" />
@@ -64,5 +86,11 @@ Ensure you have the Gemini CLI installed and run the following to activate the w
 For detailed instructions on leveraging the EKS and GitHub MCP servers, refer to the [Agentic DevOps Guide](ai_assistant.md).
 For a comprehensive breakdown of the deployment pipeline, refer to the [CI/CD & GitOps Flow](cicdflow.md).
 
-## 📜 License
+## 📄 Platform Documentation (New)
+
+- [IDP Overview](docs/IDP-OVERVIEW.md) — Full platform vision and capabilities
+- [Golden Paths](docs/GOLDEN-PATHS.md) — Standardized developer workflows
+
+## 📄 License
+
 This project is for educational and prototype purposes. Application images used are under the Unsplash License.
