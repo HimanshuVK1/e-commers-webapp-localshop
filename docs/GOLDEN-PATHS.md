@@ -1,59 +1,48 @@
-# Golden Paths – LocalShop Internal Developer Platform
+# Golden Paths - LocalShop IDP
 
-**Purpose:** Standardized, secure, and fast workflows for common developer tasks.
+**Golden Paths** are the opinionated, recommended, and supported ways to perform common tasks in the platform. Following them ensures speed, security, and consistency.
 
-## 1. New Microservice Golden Path (Recommended)
+## 1. New Microservice (Primary Golden Path)
 
-### Steps
+**Goal:** Scaffold and deploy a new microservice quickly and compliantly.
 
-1. **Create new service repository** (or use monorepo structure)
-2. **Use provided Helm chart template** (located in `/helm/`)
-3. **Add ArgoCD Application manifest** in `argocd/applications/`
-4. **Raise PR to `main`** → ArgoCD automatically syncs
-5. **Secrets are injected automatically** via External Secrets Operator
+1. Go to **Backstage Developer Portal**
+2. Use the `new-microservice` template
+3. Fill in service details (name, language, team, etc.)
+4. Template automatically creates:
+   - Repository structure
+   - Helm chart
+   - ArgoCD Application
+   - Proper labels & annotations
+5. Push code → ArgoCD deploys automatically
 
-### Example Commands
+**Backstage Template Location:** `backstage/templates/new-microservice/`
 
-```bash
-git checkout -b feature/new-payment-service
-# Copy template
-cp -r helm/templates/microservice-template/* services/payment/
-# Update values
-# Commit + PR
-```
+## 2. Infrastructure Provisioning (EKS / RDS / VPC)
 
-**Time to Production:** ~15 minutes (after first setup)
+1. Use reusable **Terraform modules** in `terraform/modules/`
+2. Configure via `variables.tf` or claims (future Crossplane)
+3. Submit PR → Infrastructure is provisioned via CI/CD
 
-## 2. Self-Service RDS Database Provisioning
+## 3. Secrets Management
 
-1. Use Terraform module: `terraform/modules/rds/`
-2. Create a `claim` file in `crossplane/claims/` (or Terraform plan)
-3. Raise PR → Infrastructure is provisioned automatically
-4. Connection details injected into your service via ESO
+- Never commit secrets
+- Use **External Secrets Operator** + AWS Secrets Manager
+- IRSA is configured for secure pod-to-AWS access
 
-## 3. GPU Workload Deployment (AI/ML)
+## 4. Security & Compliance
 
-- Use the NVIDIA GPU Operator enabled EKS node groups
-- Deploy via Helm chart with GPU resource requests
-- Monitored via DCGM exporter
+- All IaC scanned with **Checkov**
+- Policy-as-Code enforced via **Kyverno** (coming soon)
+- Guardrails applied automatically
 
-## 4. AI Agent-Assisted Operations
+## Benefits
 
-You can use the Gemini CLI + GitHub MCP to:
-- Generate Terraform code
-- Review security posture (Checkov)
-- Create branches and PRs automatically
-
-Example prompt:
-> "Create a new golden path for a Node.js microservice with Redis cache"
-
-## Benefits of Following Golden Paths
-
-- Consistent security posture
-- Reduced onboarding time for new developers
-- Lower operational toil for platform team
-- Built-in observability and rollback
+- **Consistency** across all services
+- **Security by default**
+- **Faster delivery** (minutes instead of days)
+- **Reduced support load** on platform team
 
 ---
 
-*All golden paths are enforced with policy-as-code where possible.*
+*All golden paths are designed to be self-service and auditable.*
