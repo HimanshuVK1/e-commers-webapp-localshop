@@ -1,0 +1,39 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: new-microservice
+  title: Create New Microservice (Golden Path)
+  description: Scaffolds a new production-ready microservice with Helm, ArgoCD, EKS-ready config and security guardrails
+  tags:
+    - recommended
+    - kubernetes
+    - helm
+spec:
+  owner: platform-team
+  type: service
+  parameters:
+    - title: Service Information
+      properties:
+        name:
+          title: Service Name
+          type: string
+          description: Name of the new microservice
+        description:
+          title: Description
+          type: string
+          description: Short description of the service
+  steps:
+    - id: fetch-base
+      name: Fetch Base Template
+      action: fetch:template
+      input:
+        url: ./skeleton
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        repoUrl: github.com?owner=${{ parameters.owner }}&repo=${{ parameters.name }}
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.repositoryUrl }}

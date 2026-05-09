@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ parameters.name }}
+  description: ${{ parameters.description }}
+  tags:
+    - microservice
+    - helm
+spec:
+  type: service
+  owner: platform-team
+  lifecycle: production
